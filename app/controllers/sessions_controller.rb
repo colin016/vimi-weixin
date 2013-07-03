@@ -28,11 +28,32 @@ class SessionsController < ApplicationController
   end
 
   def process_text(message)
+  	receive_content = message['Content']
+  	user_id = message['FromUserName']
+  	order = Order.where(user_id: user_id).last
+  	text = nil
+  	if receive_content == "下单" 
+  		order = Order.create(user_id: user_id)
+  		text = order.proceed!
+  	elsif order.nil?
+	  	text = "对不起哟，我们正在开发新功能~ 下边是您说了的话。我们还是能看到的!\n#{receive_content}"
+	elsif order < :accepted or order < :rejected
+		if receive_content != "><"
+			text = order.proceed!
+		else
+			order.reinput!
+		end
+	end
+
+  	message_with_text(message, text)
+  end
+
+  def message_with_text(message, text)
   	{
 		toUser: message['FromUserName'],
 		fromUser: message['ToUserName'],
 		type: 'text',
-		content: "对不起哟，我们正在开发新功能~ 下边是您说了的话。我们还是能看到的!\n#{message['Content']}"
+		content: text
   	}
   end
 
