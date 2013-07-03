@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'digest/sha1'
-require 'mini_magick'
 
 class SessionsController < ApplicationController
   def entry
@@ -41,7 +40,7 @@ class SessionsController < ApplicationController
   	{
 		toUser: message['FromUserName'],
 		fromUser: message['ToUserName'],
-		type: 'picurl',
+		type: 'news',
 		title: '随机的小猫图',
 		description: '功能还在开发中..',
 		picurl: do_process_image(message['PicUrl']),
