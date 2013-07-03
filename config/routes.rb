@@ -1,5 +1,6 @@
 PureFortress9858::Application.routes.draw do
   get "sessions/entry"
+  post "sessions/entry" => "sessions#talk"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
