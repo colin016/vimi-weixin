@@ -42,8 +42,8 @@ class SessionsController < ApplicationController
 		toUser: message['FromUserName'],
 		fromUser: message['ToUserName'],
 		type: 'picurl',
-		title: '处理过的照片',
-		description: '旋转缩小了一下。',
+		title: '随机的小猫图',
+		description: '功能还在开发中..',
 		picurl: do_process_image(message['PicUrl']),
 		url: ''
   	}
@@ -56,5 +56,7 @@ class SessionsController < ApplicationController
 	#   c.rotate "-90"
 	# end
 	# image.write "output.jpg"  	
+	width, height = rand(20) + 640, rand(20) + 320
+	"http://placekitten.com/#{width}/#{height}"
   end
 end
