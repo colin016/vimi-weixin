@@ -1,0 +1,16 @@
+<xml>
+	<ToUserName><![CDATA[<%= @send_message[:toUser] %>]]></ToUserName>
+	<FromUserName><![CDATA[<%= @send_message[:fromUser] %>]]></FromUserName>
+	<CreateTime><%= Time.now.to_i %></CreateTime>
+	<MsgType><![CDATA[<%= @send_message[:type] %>]]></MsgType>
+	<ArticleCount>1</ArticleCount>
+	<Articles>
+		<item>
+		<Title><![CDATA[<%= @send_message[:title] %>]]></Title> 
+			<Description><![CDATA[<%= @send_message[:description] %>]]></Description>
+			<PicUrl><![CDATA[<%= @send_message[:picurl] %>]]></PicUrl>
+			<Url><![CDATA[<%= @send_message[:url] %>]]></Url>
+		</item>
+	</Articles>
+	<FuncFlag>1</FuncFlag>
+</xml>
