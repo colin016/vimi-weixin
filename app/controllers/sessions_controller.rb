@@ -34,12 +34,14 @@ class SessionsController < ApplicationController
   	text = nil
   	if receive_content == "下单" 
   		order = Order.create(user_id: user_id)
-  		text = order.proceed!
-  	elsif order.nil?
+  		order.proceed!
+  		text = order.state_in_words
+  	elsif order.nil? or order.rejected? or order.accepted?
 	  	text = "对不起哟，我们正在开发新功能~ 下边是您说了的话。我们还是能看到的!\n#{receive_content}"
-	elsif order < :accepted or order < :rejected
+	elsif order.current_state < :accepted or order.current_state < :rejected
 		if receive_content != "><"
-			text = order.proceed!
+			order.proceed!
+			text = order.state_in_words
 		else
 			order.reinput!
 		end

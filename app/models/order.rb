@@ -1,20 +1,23 @@
+# encoding: utf-8
 require 'workflow'
 
 class Order < ActiveRecord::Base
   attr_accessible :user_id
 
-  def proceed
-  	case self.current_state
+  def state_in_words
+  	case current_state.to_sym
   	when :new
-	  	"请问您的姓名："
   	when :asking_name
-	  	"请问您的地址："
+	  	"请问您的姓名："
   	when :asking_address
-	  	"请问您的联系方式："
+	  	"请问您的地址："
   	when :asking_contact
-	  	"您的姓名是：\n地址：\n联系方式：\n"
+	  	"请问您的联系方式："
 	  when :submiting
-	  	"收到您的订单，请等待。"
+	  	"您的姓名是：\n地址：\n联系方式：\n"
+	  when :accepted
+	  	"下单成功！"
+	  else
   	end
   end
 
