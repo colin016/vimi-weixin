@@ -30,15 +30,12 @@ class SessionsController < ApplicationController
     end
     
     if order and order.current_state == :submiting
-      @send_message = process_image(@receive_message)
+      @send_message = process_image(@receive_message, edit_order_url(order))
       render :image
     else
       @send_message = message_with_text(@receive_message, order && order.state_in_words)
       render :text
     end
-  end
-
-  def process_text(message)
   end
 
   def message_with_text(message, text)
@@ -52,7 +49,7 @@ class SessionsController < ApplicationController
   	}
   end
 
-  def process_image(message)
+  def process_image(message, url = "")
   	{
   		toUser: message['FromUserName'],
   		fromUser: message['ToUserName'],
@@ -60,7 +57,7 @@ class SessionsController < ApplicationController
   		title: '明信片预览',
   		description: "输入【下单】送出明信片。点击下边【阅读全文】查看或修改订单详情。",
   		picurl: placeholder_image(message['PicUrl']),
-  		url: ''
+  		url: url
   	}
   end
 
