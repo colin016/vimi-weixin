@@ -53,7 +53,7 @@ class SessionsController < ApplicationController
       @send_message = message_with_order(@receive_message, order, user)
       render :text
     else
-      @send_message = message_with_text(@receive_message)
+      @send_message = message_with_text(@receive_message, user.state_in_words)
       render :text
     end
   end

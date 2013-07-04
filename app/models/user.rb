@@ -25,7 +25,7 @@ public
   def state_in_words
     case self.workflow_state.to_sym
     when :normal
-      "1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
+      "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
     end
   end
 
