@@ -1,0 +1,25 @@
+{
+  "author": {
+    "name": "ququplay"
+  },
+  "name": "jqm-faltui",
+  "description": "jQuery Mobile Flat UI Theme",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ququplay/jquery-mobile-flat-ui-theme.git"
+  },
+  "ignore": [
+    "node_modules",
+    "src",
+    ".gitignore",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {},
+  "gitHead": "aca2b87c535729eed56f44a1cdd5783d7f03da5d",
+  "readme": "## jQuery Mobile Flat-UI Theme\n\n[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/1459013/) \n\nTheme for jQuery Mobile based on [Flat-UI](http://designmodo.com/demo/flat-ui/).\n\n![jQuery-Mobile-Flat-UI-Theme](http://oi46.tinypic.com/xm2xlc.jpg)\n\n## Demo\n\n[http://ququplay.github.com/jquery-mobile-flat-ui-theme](http://ququplay.github.com/jquery-mobile-flat-ui-theme)\n\n## Versions\n\nWe are going to use master branch to keep up to date with jQuery Mobile versions. Previous versions will be moved to corresponding branches.\n\n### Current branch layout\n\n- master - jQuery Mobile version 1.3.1\n- jqm-1.3.0 - jQuery Mobile version 1.3.0\n\n## Usage\n\n- Copy `jquery.mobile.flatui.css`, fonts and images from `generated` folder to your project.\nInclude link to `jquery.mobile.flatui.css`\n\n```html\n <link rel=\"stylesheet\" type=\"text/css\" href=\"jquery.mobile.flatui.css\" />\n```\n- jquery-mobile-flat-ui-theme is a [bower](https://github.com/twitter/bower) [component](http://sindresorhus.com/bower-components/) you should be able to install it by running:\n\n`bower install jqm-flatui`\n\nor if you already have a bower based project you can add jquery-mobile-flat-ui-theme to your dependency list in `bower.json`\n\n```js\n \"dependencies\": {\n    ...\n    \"jqm-flatui\": \"latest\"\n    ...\n  }\n```\n\nInclude link to `jquery.mobile.flatui.css`\n\n```html\n <link rel=\"stylesheet\" type=\"text/css\" href=\"/components/generated/jquery.mobile.flatui.css\" />\n```\n\n## Setup\n\nIn order to add a new swatch or colors you can add a new stylus file under `src/stylus/swatches/` and run [grunt](http://gruntjs.com/) from your command line.\n\n- brew install node\n- npm install -g grunt-cli\n- cd to project's folder\n- npm install\n- grunt watch\n- start modifying css/stylus files\n\n## Contributors\n\n* [@tomkuk](http://github.com/tomkuk)\n* [@mkuklis](http://github.com/mkuklis)\n\n##License:\n\n[The WTFPL License](http://en.wikipedia.org/wiki/WTFPL)\n\n",
+  "readmeFilename": "README.md",
+  "_id": "jqm-faltui@0.1.0",
+  "commit": "aca2b87c535729eed56f44a1cdd5783d7f03da5d"
+}

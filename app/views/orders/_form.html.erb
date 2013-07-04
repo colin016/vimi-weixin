@@ -12,22 +12,22 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :receiver_name %><br />
+    <%= f.label :receiver_name, "收件人" %>
     <%= f.text_field :receiver_name %>
   </div>
   <div class="field">
-    <%= f.label :receiver_address %><br />
+    <%= f.label :receiver_address, "收件地址" %>
     <%= f.text_field :receiver_address %>
   </div>
   <div class="field">
-    <%= f.label :receiver_code %><br />
+    <%= f.label :receiver_code, "邮编" %>
     <%= f.text_field :receiver_code %>
   </div>
   <div class="field">
-    <%= f.label :receiver_contact %><br />
+    <%= f.label :receiver_contact, "联系方式" %>
     <%= f.text_field :receiver_contact %>
   </div>
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit "更新订单", {"data-icon" => "flat-new", "data-theme" => "b"} %>
   </div>
 <% end %>

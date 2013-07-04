@@ -2,7 +2,7 @@
 require 'workflow'
 
 class Order < ActiveRecord::Base
-  attr_accessible :user_id
+  attr_accessible :user_id, :receiver_name, :receiver_address, :receiver_code, :receiver_contact
 
 
   def state_in_words
