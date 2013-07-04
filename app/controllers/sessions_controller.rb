@@ -20,9 +20,10 @@ class SessionsController < ApplicationController
 
   	case @receive_message['MsgType']
   	when "text"
+      content = @receive_message['Content']
       order = Order.where(user_id: user).last
       order = nil if order.nil? or order.current_state == :accepted or order.current_state == :rejected
-      order.proceed! if order
+      order.proceed!(content) if order
   	when "image"
       order = Order.create(user_id: user)
       order.proceed!

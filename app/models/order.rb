@@ -3,7 +3,6 @@ require 'workflow'
 
 class Order < ActiveRecord::Base
   attr_accessible :user_id
-  attr_accessor :receiver_name, :receiver_address, :receiver_code, :receiver_contact
 
 
   def state_in_words
@@ -25,8 +24,18 @@ class Order < ActiveRecord::Base
   	end
   end
 
-  def reject
-  	"已经取消订单。"
+  def proceed(info = "")
+    case current_state.to_sym
+    when :new
+    when :asking_name
+      self.update_attribute(:receiver_name, info)
+    when :asking_address
+      self.update_attribute(:receiver_address, info)
+    when :asking_code
+      self.update_attribute(:receiver_code, info)
+    when :asking_contact
+      self.update_attribute(:receiver_contact, info)
+    end
   end
 
   include Workflow
