@@ -14,71 +14,57 @@ class SessionsController < ApplicationController
   end
 
   def talk
-  	# parser = Nori.new
   	@receive_message = Hash.from_xml(request.body.read)["xml"]
+    user = @receive_message['FromUserName']
+    order = nil
 
   	case @receive_message['MsgType']
   	when "text"
-	  	@send_message = process_text(@receive_message)
-	  	render :text
+      order = Order.where(user_id: user).last
+      order = nil if order.nil? or order.current_state == :accepted or order.current_state == :rejected
+      order.proceed! if order
   	when "image"
-  		@send_message = process_image(@receive_message)
-  		render :image
-  	end
+      order = Order.create(user_id: user)
+      order.proceed!
+    end
+    
+    if order and order.current_state == :submiting
+      @send_message = process_image(@receive_message)
+      render :image
+    else
+      @send_message = message_with_text(@receive_message, order && order.state_in_words)
+      render :text
+    end
   end
 
   def process_text(message)
-  	receive_content = message['Content']
-  	user_id = message['FromUserName']
-  	order = Order.where(user_id: user_id).last
-  	text = nil
-  	if receive_content == "下单" 
-  		order = Order.create(user_id: user_id)
-  		order.proceed!
-  		text = order.state_in_words
-  	elsif order.nil? or order.rejected? or order.accepted?
-	  	text = "对不起哟，我们正在开发新功能~ 下边是您说了的话。我们还是能看到的!\n#{receive_content}"
-	elsif order.current_state < :accepted or order.current_state < :rejected
-		if receive_content != "><"
-			order.proceed!
-			text = order.state_in_words
-		else
-			order.reinput!
-		end
-	end
-
-  	message_with_text(message, text)
   end
 
   def message_with_text(message, text)
+    default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{message['Content']}"
+
   	{
-		toUser: message['FromUserName'],
-		fromUser: message['ToUserName'],
-		type: 'text',
-		content: text
+  		toUser: message['FromUserName'],
+  		fromUser: message['ToUserName'],
+  		type: 'text',
+  		content: text || default_reply
   	}
   end
 
   def process_image(message)
   	{
-		toUser: message['FromUserName'],
-		fromUser: message['ToUserName'],
-		type: 'news',
-		title: '随机的小猫图',
-		description: '功能还在开发中..',
-		picurl: do_process_image(message['PicUrl']),
-		url: ''
+  		toUser: message['FromUserName'],
+  		fromUser: message['ToUserName'],
+  		type: 'news',
+  		title: '明信片预览',
+  		description: "输入【下单】送出明信片。点击下边【阅读全文】查看或修改订单详情。",
+  		picurl: placeholder_image(message['PicUrl']),
+  		url: ''
   	}
   end
 
-  def do_process_image(url)
-	# image = MiniMagick::Image.open(url)
-	# image.combine_options do |c|
-	#   c.sample "50%"
-	#   c.rotate "-90"
-	# end
-	# image.write "output.jpg"  	
-	width, height = rand(20) + 640, rand(20) + 320
-	"http://placekitten.com/#{width}/#{height}"
+  def placeholder_image(url)	
+  	width, height = rand(20) + 480, rand(20) + 320
+  	"http://placekitten.com/#{width}/#{height}"
   end
 end

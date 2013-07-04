@@ -1,5 +1,5 @@
-source "http://rubygems.org"
-# source "http://ruby.taobao.org"
+# source "http://rubygems.org"
+source "http://ruby.taobao.org"
 
 gem 'rails', '3.2.13'
 
@@ -39,3 +39,5 @@ gem 'jquery-rails'
 # gem 'debugger'
 
 gem 'workflow'
+
+gem 'thin'
