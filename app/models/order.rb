@@ -38,6 +38,10 @@ class Order < ActiveRecord::Base
     end
   end
 
+  def to_s
+    "【收件人】#{self.receiver_name}\n【收件人地址】#{self.receiver_address}\n【收件人邮编】#{self.receiver_code}\n【收件人联系方式】#{self.receiver_contact}\n【订单状态】已于#{Time.now - 30.minutes}发件。"
+  end
+
   include Workflow
   workflow do
     state :new do

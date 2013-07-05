@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  openid: MyString
+  workflow_state: MyString
+
+two:
+  openid: MyString
+  workflow_state: MyString

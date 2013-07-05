@@ -9,36 +9,69 @@ class SessionsController < ApplicationController
   	text = my_params.values.sort.join
   	hash_text = Digest::SHA1.hexdigest text
 
-  	# render :json => {params: my_params.values.sort, signature: params['signature'], my_signature: hash_text}
   	render text: params['echostr'] if params['signature'] == hash_text
   end
 
   def talk
   	@receive_message = Hash.from_xml(request.body.read)["xml"]
-    user = @receive_message['FromUserName']
+    user = User.find_or_create_by_openid(@receive_message['FromUserName'])
     order = nil
 
-  	case @receive_message['MsgType']
-  	when "text"
-      content = @receive_message['Content']
-      order = Order.where(user_id: user).last
-      order = nil if order.nil? or order.current_state == :accepted or order.current_state == :rejected
-      order.proceed!(content) if order
-  	when "image"
-      order = Order.create(user_id: user)
+    if @receive_message['Content'] == '#'
+      user.exit!
+
+      @send_message = message_with_text(@receive_message, user.state_in_words)
+      render :text
+    elsif @receive_message['MsgType'] == 'image'
+      user.order!
+      order = Order.create(user_id: user.openid)
       order.proceed!
-    end
-    
-    if order and order.current_state == :submiting
-      @send_message = process_image(@receive_message, edit_order_url(order))
-      render :image
+
+      @send_message = message_with_text(@receive_message, order.state_in_words)
+      render :text
+    elsif user.current_state == :ordering
+      order = Order.where(user_id: user.openid).last
+      content = @receive_message['Content']
+      order.proceed!(content)
+      user.exit! if order.current_state == :accepted
+
+      if order.current_state == :submiting
+        @send_message = process_image(@receive_message, edit_order_url(order))
+        render :image
+      else
+        @send_message = message_with_text(@receive_message, order.state_in_words)
+        render :text
+      end
+    elsif @receive_message['Content'] == '查订单'
+      user.query!
+      @send_message = message_with_text(@receive_message, "请输入您的订单号：")
+      render :text
+    elsif user.current_state == :querying
+      order_id = @receive_message['Content']
+      order = Order.find_by_id(order_id)
+
+      @send_message = message_with_order(@receive_message, order, user)
+      render :text
     else
-      @send_message = message_with_text(@receive_message, order && order.state_in_words)
+      @send_message = message_with_text(@receive_message, user.state_in_words)
       render :text
     end
   end
 
-  def message_with_text(message, text)
+  def message_with_order(message, order = nil, user = nil)
+    if user.openid != order.user_id
+      text = "只能查询自己的订单。"
+    elsif order
+      text = order.to_s
+    else
+      text = "订单号错误。"
+    end
+    text += "\n\n输入订单号继续查询，输入【#】退出查询。"
+
+    message_with_text(message, text)
+  end
+
+  def message_with_text(message, text = nil)
     default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{message['Content']}"
 
   	{
