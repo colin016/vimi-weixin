@@ -62,7 +62,7 @@ class SessionsController < ApplicationController
     if user.openid != order.user_id
       text = "只能查询自己的订单。"
     elsif order
-      text = "收件人：#{order.receiver_name}\n收件人地址：#{order.receiver_address}\n收件人邮编：#{order.receiver_code}\n收件人联系方式：#{order.receiver_contact}"
+      text = order.to_s
     else
       text = "订单号错误。"
     end
