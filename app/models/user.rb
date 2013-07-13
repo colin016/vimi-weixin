@@ -46,9 +46,10 @@ class User < ActiveRecord::Base
   end
 
   def 帮助
+    o = self.latest_order
     self.res = {
       type: "text",
-      content: "点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦（您已发#{7}张照片）~~"
+      content: "点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦（您已发#{o.images.count}张照片）~~"
     }
   end
 
@@ -64,9 +65,10 @@ class User < ActiveRecord::Base
   end
 
   def 确认
+    o = self.latest_order
     self.res = {
       type: "text",
-      content: "亲~ 您的订单已经提交，订单号是#{Order.new.id}。请尽快支付，以便我们为您制作和邮寄~~\n支付地址：【支付地址链接】\n\n如果支付期间遇到问题，请回复【找客服】。"
+      content: "亲~ 您的订单已经提交，订单号是#{o.id}。请尽快支付，以便我们为您制作和邮寄~~\n支付地址：【支付地址链接】\n\n如果支付期间遇到问题，请回复【找客服】。"
     }
   end
 
@@ -76,12 +78,32 @@ class User < ActiveRecord::Base
 
   def 照片(pic_url)
     o = self.latest_order
-    im = o.images.build({path: "#{Rails.public_path}/images/#{im.object_id}"})
+    im = o.images.create({path: "#{Rails.public_path}/images/#{im.object_id}"})
     File.open(im.path, "wb") do |io|
       io.write(open(pic_url).read())
     end
-    im.save
     o.save
+
+
+    if o.photos.count < 3 then
+      self.res = {
+        type: "text",
+        content: "收到#{o.images.count}张照片。"
+      }
+    else
+      self.res = {
+        type: "text",
+        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n 【网页链接】\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+      }
+    end
+  end
+
+  def 下单
+    o = self.latest_order
+    self.res = {
+      type: "text",
+      content: "以下是订单信息：#{o.description}\n\n如果信息有误，请点击一下链接修改：【网页链接】\n确认信息请回复【确认】~~"
+    } 
   end
 
   def exit
@@ -122,12 +144,6 @@ class User < ActiveRecord::Base
   end
 
 public
-  def state_in_words
-    # case self.workflow_state.to_sym
-    # when :normal
-    #   "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
-    # end
-  end
 
   def process_message(m)
     event = message_to_event(m)
@@ -151,7 +167,11 @@ public
     elsif m["MsgType"] == 'image'
       return ["照片!", m["PicUrl"]]
     end
-  end  
+  end
+
+  def send_message(text)
+    
+  end
 
 private
   def default_values
