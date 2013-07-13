@@ -17,7 +17,10 @@ class User < ActiveRecord::Base
   attr_accessor :res
 
   def 照片卡
-    puts "In #{__method__}"
+    self.res = {
+      type: "text",
+      content: "请选择您希望打印的12张照片发给我们。如果发照片期间您有问题，请回复【帮助】。"
+    }
   end
 
   def 查订单
@@ -30,6 +33,7 @@ class User < ActiveRecord::Base
         type: "text",
         content: "暂时还没有您的订单。"
       }
+      self.exit!
     elsif order_num == 1
       self.res = {
         type: "text",
@@ -50,11 +54,7 @@ class User < ActiveRecord::Base
   def 找客服
     # TODO
   end
-
-  def 照片
-    
-  end
-
+  
   def 下单
     self.res = {
       type: "text",
@@ -70,7 +70,11 @@ class User < ActiveRecord::Base
   end
 
   def 数字(num)
-    puts "In #{__method__}"
+    puts "In #{__method__}(#{num})"
+  end
+
+  def 照片(pic_url)
+    puts "In #{__method__}(#{pic_url})"
   end
 
   include Workflow
@@ -127,7 +131,7 @@ public
       end
 
     elsif m["MsgType"] == 'image'
-      return "照片!"
+      return ["照片!", m["PicUrl"]]
     end
   end  
 
