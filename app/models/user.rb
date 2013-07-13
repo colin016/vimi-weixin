@@ -77,6 +77,7 @@ class User < ActiveRecord::Base
   end
 
   def 照片(pic_url)
+    puts "1"*20
     o = self.latest_order
     im = o.images.create({path: "#{Rails.public_path}/images/#{im.object_id}"})
     File.open(im.path, "wb") do |io|
@@ -84,13 +85,15 @@ class User < ActiveRecord::Base
     end
     o.save
 
-
-    if o.photos.count < 3 then
+    p o.images
+    if o.images.count < 3 then
       self.res = {
         type: "text",
         content: "收到#{o.images.count}张照片。"
       }
     else
+      puts "2"*20
+
       self.res = {
         type: "text",
         content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n 【网页链接】\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
@@ -99,10 +102,11 @@ class User < ActiveRecord::Base
   end
 
   def 下单
+    puts "3"*20
     o = self.latest_order
     self.res = {
       type: "text",
-      content: "以下是订单信息：#{o.description}\n\n如果信息有误，请点击一下链接修改：【网页链接】\n确认信息请回复【确认】~~"
+      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：【网页链接】\n确认信息请回复【确认】~~"
     } 
   end
 
@@ -151,6 +155,7 @@ public
 
     return res
   rescue NoMethodError => ex
+    p ex
     self.exit!
   end
 
