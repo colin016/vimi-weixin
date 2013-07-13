@@ -1,4 +1,7 @@
 PureFortress9858::Application.routes.draw do
+  resources :images
+
+
   get "orders/edit"
 
   get "sessions/entry"

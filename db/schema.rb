@@ -11,10 +11,17 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130704111740) do
+ActiveRecord::Schema.define(:version => 20130713084107) do
+
+  create_table "images", :force => true do |t|
+    t.integer  "order_id"
+    t.integer  "index"
+    t.string   "path"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "orders", :force => true do |t|
-    t.string   "user_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
     t.string   "workflow_state"
@@ -22,6 +29,7 @@ ActiveRecord::Schema.define(:version => 20130704111740) do
     t.string   "receiver_address"
     t.string   "receiver_code"
     t.string   "receiver_contact"
+    t.integer  "user_id"
   end
 
   create_table "users", :force => true do |t|

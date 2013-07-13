@@ -3,7 +3,12 @@ require 'workflow'
 
 class Order < ActiveRecord::Base
   attr_accessible :user_id, :receiver_name, :receiver_address, :receiver_code, :receiver_contact
+  belongs_to :user
+  has_many :images
 
+  def image_count
+    images.count
+  end
 
   def state_in_words
   	case current_state.to_sym

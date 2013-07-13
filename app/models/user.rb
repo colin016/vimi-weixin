@@ -4,7 +4,6 @@ require 'workflow'
 
 class String
   def is_number?
-    p "1"*20
     true if Float(self) rescue false
   end
 end
@@ -13,6 +12,7 @@ end
 class User < ActiveRecord::Base
   attr_accessible :openid
   after_initialize :default_values
+  has_many :orders
 
   attr_accessor :res
 
@@ -21,7 +21,23 @@ class User < ActiveRecord::Base
   end
 
   def 查订单
-    puts "In #{__method__}"
+    orders = self.orders
+    order_num = orders.count
+    latest_order = orders.last
+
+    if order_num == 0
+      self.res = {
+        type: "text",
+        content: "暂时还没有您的订单。"
+      }
+    elsif order_num == 1
+      self.res = {
+        type: "text",
+        content: "以下是您最新一笔订单的信息与状态：\n#{latest_order.description}"
+      }
+    else 
+      self.res[:content] += "您还有#{2}份历史订单，分别是：\n#{orders.simple_list}\n输入订单号查询这些订单。"
+    end
   end
 
   def 帮助
