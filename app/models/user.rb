@@ -6,15 +6,37 @@ class User < ActiveRecord::Base
   attr_accessible :openid
   after_initialize :default_values
 
+  attr_accessor :res
+
+  def 照片卡
+    puts "In #{__method__}"
+  end
+
+  def 查订单
+    puts "In #{__method__}"
+  end
+
+  def 帮助
+    self.res = {
+      type: "text",
+      content: "点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦（您已发#{7}张照片）~~"
+    }
+  end
+
+  def 找客服
+    # TODO
+  end
+
   include Workflow
   workflow do
     state :normal do
-      event :order, transitions_to: :ordering
-      event :query, transitions_to: :querying
+      event "查订单", transitions_to: :ordering
+      event "照片卡", transitions_to: :querying
       event :exit, transitions_to: :normal
     end
 
     state :ordering do
+      event "帮助", transitions_to: :ordering
       event :exit, transitions_to: :normal
     end
 
@@ -32,9 +54,14 @@ public
   end
 
   def process_message(m)
-    p '-'*20
-    p m
-    p '-'*20
+    m_content = m['Content']
+    event = "#{m_content}!"
+    self.send(event)
+
+    return res
+  rescue => ex
+    puts ex
+    self.exit!
   end
 
 private

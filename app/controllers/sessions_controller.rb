@@ -13,12 +13,16 @@ class SessionsController < ApplicationController
   end
 
   def talk
-    send_message = sender.process_message(receive_message)
-    render_message(send_message)
+    m = sender.process_message(receive_message)
+    render_message(m)
   end
 
   def render_message(m)
-    render text: 200
+    if m[:type] == 'text' 
+      @send_message = message_with_text(receive_message, m[:content])
+      render :text
+    else
+    end
   end
 
   def receive_message
