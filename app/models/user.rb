@@ -35,13 +35,15 @@ class User < ActiveRecord::Base
         content: "暂时还没有您的订单。"
       }
       self.exit!
-    elsif order_num == 1
+    else
       self.res = {
         type: "text",
         content: "以下是您最新一笔订单的信息与状态：\n#{latest_order.description}"
       }
-    else 
-      self.res[:content] += "您还有#{2}份历史订单，分别是：\n#{orders.simple_list}\n输入订单号查询这些订单。"
+    end
+
+    if order_num > 1 
+      self.res[:content] += "\n\n您还有#{order_num}份历史订单，分别是：\n#{orders.simple_list}\n输入订单号查询这些订单。"
     end
   end
 
@@ -66,6 +68,8 @@ class User < ActiveRecord::Base
 
   def 确认
     o = self.latest_order
+    o.accept!
+
     self.res = {
       type: "text",
       content: "亲~ 您的订单已经提交，订单号是#{o.id}。请尽快支付，以便我们为您制作和邮寄~~\n支付地址：【支付地址链接】\n\n如果支付期间遇到问题，请回复【找客服】。"
@@ -119,7 +123,11 @@ class User < ActiveRecord::Base
   end
 
   def latest_order
-    self.orders.last || self.orders.create
+    if (o = self.orders.last) && (not o.accepted?)
+      return o
+    else
+      return self.orders.create
+    end
   end
 
   include Workflow
@@ -151,12 +159,13 @@ public
 
   def process_message(m)
     event = message_to_event(m)
-    self.send(*event)
+    if self.respond_to? *event
+      self.send(*event)
 
-    return res
-  rescue NoMethodError => ex
-    p ex
-    self.exit!
+      return res
+    else
+      self.exit!
+    end
   end
 
   def message_to_event(m)

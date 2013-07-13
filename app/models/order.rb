@@ -6,6 +6,10 @@ class Order < ActiveRecord::Base
   belongs_to :user
   has_many :images
 
+  def self.simple_list
+    all.inject("") { |str, o| str += "#{o.id}: #{o.status}" }
+  end
+
   def image_count
     images.count
   end
@@ -19,6 +23,7 @@ class Order < ActiveRecord::Base
   workflow do
     state :new do
       event :proceed, :transitions_to => :asking_name
+      event :accept, transitions_to: :accepted
     end
     state :asking_name do
       event :proceed, :transitions_to => :asking_address
