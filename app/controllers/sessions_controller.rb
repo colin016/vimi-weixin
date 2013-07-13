@@ -13,49 +13,20 @@ class SessionsController < ApplicationController
   end
 
   def talk
-  	@receive_message = Hash.from_xml(request.body.read)["xml"]
-    user = User.find_or_create_by_openid(@receive_message['FromUserName'])
-    order = nil
+    send_message = sender.process_message(receive_message)
+    render_message(send_message)
+  end
 
-    if @receive_message['Content'] == '#'
-      user.exit!
+  def render_message(m)
+    render text: 200
+  end
 
-      @send_message = message_with_text(@receive_message, user.state_in_words)
-      render :text
-    elsif @receive_message['MsgType'] == 'image'
-      user.order!
-      order = Order.create(user_id: user.openid)
-      order.proceed!
+  def receive_message
+    @receive_message ||= Hash.from_xml(request.body.read)["xml"]
+  end
 
-      @send_message = message_with_text(@receive_message, order.state_in_words)
-      render :text
-    elsif user.current_state == :ordering
-      order = Order.where(user_id: user.openid).last
-      content = @receive_message['Content']
-      order.proceed!(content)
-      user.exit! if order.current_state == :accepted
-
-      if order.current_state == :submiting
-        @send_message = process_image(@receive_message, edit_order_url(order))
-        render :image
-      else
-        @send_message = message_with_text(@receive_message, order.state_in_words)
-        render :text
-      end
-    elsif @receive_message['Content'] == '查订单'
-      user.query!
-      @send_message = message_with_text(@receive_message, "请输入您的订单号：")
-      render :text
-    elsif user.current_state == :querying
-      order_id = @receive_message['Content']
-      order = Order.find_by_id(order_id)
-
-      @send_message = message_with_order(@receive_message, order, user)
-      render :text
-    else
-      @send_message = message_with_text(@receive_message, user.state_in_words)
-      render :text
-    end
+  def sender
+    @user ||= User.find_or_create_by_openid(receive_message['FromUserName'])
   end
 
   def message_with_order(message, order = nil, user = nil)

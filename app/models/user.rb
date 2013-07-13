@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'workflow'
 
 class User < ActiveRecord::Base
@@ -27,6 +29,12 @@ public
     when :normal
       "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
     end
+  end
+
+  def process_message(m)
+    p '-'*20
+    p m
+    p '-'*20
   end
 
 private
