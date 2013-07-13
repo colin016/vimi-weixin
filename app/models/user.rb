@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'workflow'
+require 'open-uri'
 
 class String
   def is_number?
@@ -54,7 +55,7 @@ class User < ActiveRecord::Base
   def 找客服
     # TODO
   end
-  
+
   def 下单
     self.res = {
       type: "text",
@@ -74,7 +75,25 @@ class User < ActiveRecord::Base
   end
 
   def 照片(pic_url)
-    puts "In #{__method__}(#{pic_url})"
+    o = self.latest_order
+    im = o.images.build({path: "#{Rails.public_path}/images/#{im.object_id}"})
+    File.open(im.path, "wb") do |io|
+      io.write(open(pic_url).read())
+    end
+    im.save
+    o.save
+  end
+
+  def exit
+    self.res = {
+      type: "text",
+      content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【照片卡】创建照片卡。"
+    }
+    
+  end
+
+  def latest_order
+    self.orders.last || self.orders.create
   end
 
   include Workflow
@@ -104,10 +123,10 @@ class User < ActiveRecord::Base
 
 public
   def state_in_words
-    case self.workflow_state.to_sym
-    when :normal
-      "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
-    end
+    # case self.workflow_state.to_sym
+    # when :normal
+    #   "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单\n2. 发送照片创建明信片"
+    # end
   end
 
   def process_message(m)
@@ -115,8 +134,7 @@ public
     self.send(*event)
 
     return res
-  rescue => ex
-    p ex
+  rescue NoMethodError => ex
     self.exit!
   end
 
