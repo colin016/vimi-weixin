@@ -6,8 +6,15 @@ class Order < ActiveRecord::Base
   belongs_to :user
   has_many :images
 
-  def self.simple_list
-    all.inject("") { |str, o| str += "#{o.id}: #{o.status}" }
+  def self.simple_list(excluded_id = nil)
+    order = nil
+    if excluded_id
+      orders = where("id != #{excluded_id}")
+    else
+      orders = all
+    end
+
+    orders.inject("") { |str, o| str += " #{o.id}: #{o.status}\n" }
   end
 
   def image_count
@@ -15,7 +22,7 @@ class Order < ActiveRecord::Base
   end
 
   def to_s
-    "【收件人】#{self.receiver_name}\n【收件人地址】#{self.receiver_address}\n【收件人邮编】#{self.receiver_code}\n【收件人联系方式】#{self.receiver_contact}\n【订单状态】已于#{Time.now - 30.minutes}发件。"
+    " 订单号：#{self.id}\n 收件人：#{self.receiver_name}\n 收件地址：#{self.receiver_address}\n 物流状态：#{self.status}"
   end
   alias description to_s
 

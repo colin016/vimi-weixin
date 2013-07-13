@@ -11,6 +11,7 @@ end
 
 
 class User < ActiveRecord::Base
+  include Rails.application.routes.url_helpers
   attr_accessible :openid
   after_initialize :default_values
   has_many :orders
@@ -43,7 +44,7 @@ class User < ActiveRecord::Base
     end
 
     if order_num > 1 
-      self.res[:content] += "\n\n您还有#{order_num}份历史订单，分别是：\n#{orders.simple_list}\n输入订单号查询这些订单。"
+      self.res[:content] += "\n\n您还有#{order_num - 1}份历史订单，分别是：\n#{orders.simple_list(latest_order.id)}\n输入订单号查询这些订单。"
     end
   end
 
@@ -60,9 +61,10 @@ class User < ActiveRecord::Base
   end
 
   def 下单
+    o = self.latest_order
     self.res = {
       type: "text",
-      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n 【网页链接】"
+      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n #{edit_order_url(o, :host => 'weixin-forward.vida.fm')}"
     }
   end
 
@@ -77,14 +79,26 @@ class User < ActiveRecord::Base
   end
 
   def 数字(num)
+    o = self.orders.find(num)
+
+    self.res = {
+      type: "text",
+      content: "以下是您查询的订单的信息与状态：\n#{o.description}"
+    }
+  rescue ActiveRecord::RecordNotFound
+    self.res = {
+      type: "text",
+      content: "对不起，没有与您查询相符的订单，请重新输入。\n\n您有#{orders.count}份历史订单，分别是：\n#{orders.simple_list}输入订单号查询这些订单。"
+    }
+  ensure
     puts "In #{__method__}(#{num})"
   end
 
   def 照片(pic_url)
     puts "1"*20
     o = self.latest_order
-    im = o.images.create({path: "#{Rails.public_path}/images/#{im.object_id}"})
-    File.open(im.path, "wb") do |io|
+    im = o.images.create({path: "/images/#{SecureRandom::uuid}"})
+    File.open("#{Rails.public_path}#{im.path}", "wb") do |io|
       io.write(open(pic_url).read())
     end
     o.save
@@ -100,7 +114,7 @@ class User < ActiveRecord::Base
 
       self.res = {
         type: "text",
-        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n 【网页链接】\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: 'weixin-forward.vida.fm')}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
       }
     end
   end
@@ -110,7 +124,7 @@ class User < ActiveRecord::Base
     o = self.latest_order
     self.res = {
       type: "text",
-      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：【网页链接】\n确认信息请回复【确认】~~"
+      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：#{edit_order_url(o, host: 'weixin-forward.vida.fm')}\n确认信息请回复【确认】~~"
     } 
   end
 
@@ -148,6 +162,7 @@ class User < ActiveRecord::Base
 
     state :querying do
       event :exit, transitions_to: :normal
+      event "数字", transitions_to: :querying
     end
 
     state :submitting do
@@ -159,13 +174,12 @@ public
 
   def process_message(m)
     event = message_to_event(m)
-    if self.respond_to? *event
-      self.send(*event)
+    self.send(*event)
 
-      return res
-    else
-      self.exit!
-    end
+    return res
+  rescue NoMethodError, Workflow::NoTransitionAllowed => ex
+    p ex
+    self.exit!
   end
 
   def message_to_event(m)
