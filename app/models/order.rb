@@ -29,23 +29,7 @@ class Order < ActiveRecord::Base
   include Workflow
   workflow do
     state :new do
-      event :proceed, :transitions_to => :asking_name
       event :accept, transitions_to: :accepted
-    end
-    state :asking_name do
-      event :proceed, :transitions_to => :asking_address
-    end
-    state :asking_address do
-      event :proceed, :transitions_to => :asking_code
-    end
-    state :asking_code do
-    	event :proceed, :transitions_to => :asking_contact
-    end
-    state :asking_contact do
-      event :proceed, :transitions_to => :submiting
-    end
-    state :submiting do
-    	event :proceed, :transitions_to => :accepted
     end
     state :accepted
     state :rejected

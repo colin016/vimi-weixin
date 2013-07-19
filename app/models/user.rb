@@ -32,7 +32,7 @@ class User < ActiveRecord::Base
     state :ordering do
       event "帮助", transitions_to: :ordering
       event "照片", transitions_to: :ordering
-      event "下单", transitions_to: :submitting
+      event "下单", transitions_to: :normal
       event :q, transitions_to: :normal
     end
 
@@ -41,9 +41,9 @@ class User < ActiveRecord::Base
       event "数字", transitions_to: :normal
     end
 
-    state :submitting do
-      event "确认", transitions_to: :normal
-    end
+    # state :submitting do
+    #   event "确认", transitions_to: :normal
+    # end
   end
 
   def q
@@ -55,15 +55,7 @@ class User < ActiveRecord::Base
   end
 
   def 明信片
-    content =<<EOF
-【明信片介绍】
-
-请选择您希望打印的照片直接发给小印~
-
-如果有问题请回复【帮助】
-
-制作明信片过程中您如果想要退出，可以随时回复【q】哦~~
-EOF
+    content = "【明信片介绍】\n\n请选择您希望打印的照片直接发给小印~\n\n如果有问题请回复【帮助】\n\n制作明信片过程中您如果想要退出，可以随时回复【q】哦~~"
     self.res = {
       type: "text",
       content: content
@@ -95,6 +87,7 @@ EOF
 
   def 帮助
     o = self.latest_order
+    o.accept!
     self.res = {
       type: "text",
       content: "点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦（您已发#{o.images.count}张照片）~~"
@@ -140,7 +133,6 @@ EOF
   end
 
   def 照片(pic_url)
-    puts "1"*20
     o = self.latest_order
     im = o.images.create({path: "/images/#{SecureRandom::uuid}"})
     File.open("#{Rails.public_path}#{im.path}", "wb") do |io|
@@ -148,28 +140,25 @@ EOF
     end
     o.save
 
-    p o.images
     if o.images.count < ImageNum then
-      self.res = {
-        type: "text",
-        content: "收到#{o.images.count}张照片。"
-      }
+      raise "SHOULDN'T BE HERE"
+      # self.res = {
+      #   type: "text",
+      #   content: "收到#{o.images.count}张照片。"
+      # }
     else
-      puts "2"*20
-
       self.res = {
         type: "text",
-        content: "亲~您已发了#{ImageNum}张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
       }
     end
   end
 
   def 下单
-    puts "ImageNum"*20
     o = self.latest_order
     self.res = {
       type: "text",
-      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：#{edit_order_url(o, host: host)}\n确认信息请回复【确认】~~"
+      content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
     } 
   end
 
@@ -214,7 +203,7 @@ public
       return ["照片!", m["PicUrl"]]
     end
   end
-  
+
 private
   def host
     'weixin-forward.vida.fm'
