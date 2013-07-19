@@ -26,7 +26,8 @@ class SessionsController < ApplicationController
   end
 
   def receive_message
-    @receive_message ||= Hash.from_xml(request.body.read)["xml"]
+    xml = request.body.read
+    @receive_message ||= WxTextMessage.new(xml)
   end
 
   def sender
