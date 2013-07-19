@@ -20,10 +20,53 @@ class User < ActiveRecord::Base
 
   attr_accessor :res
 
-  def 照片卡
+  include Workflow
+  workflow do
+    state :normal do
+      event "查订单", transitions_to: :querying
+      event "明信片", transitions_to: :ordering
+      event :q, transitions_to: :normal
+      event "找客服", transitions_to: :normal
+    end
+
+    state :ordering do
+      event "帮助", transitions_to: :ordering
+      event "照片", transitions_to: :ordering
+      event "下单", transitions_to: :submitting
+      event :q, transitions_to: :normal
+    end
+
+    state :querying do
+      event :q, transitions_to: :normal
+      event "数字", transitions_to: :normal
+    end
+
+    state :submitting do
+      event "确认", transitions_to: :normal
+    end
+  end
+
+  def q
+    content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
     self.res = {
       type: "text",
-      content: "请选择您希望打印的12张照片发给我们。如果发照片期间您有问题，请回复【帮助】。"
+      content: content
+    }
+  end
+
+  def 明信片
+    content =<<EOF
+【明信片介绍】
+
+请选择您希望打印的照片直接发给小印~
+
+如果有问题请回复【帮助】
+
+制作明信片过程中您如果想要退出，可以随时回复【q】哦~~
+EOF
+    self.res = {
+      type: "text",
+      content: content
     }
   end
 
@@ -133,7 +176,7 @@ class User < ActiveRecord::Base
   def exit
     # self.res = {
     #   type: "text",
-    #   content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【照片卡】创建照片卡。"
+    #   content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【明信片】创建明信片。"
     # }
   end
 
@@ -142,32 +185,6 @@ class User < ActiveRecord::Base
       return o
     else
       return self.orders.create
-    end
-  end
-
-  include Workflow
-  workflow do
-    state :normal do
-      event "查订单", transitions_to: :querying
-      event "照片卡", transitions_to: :ordering
-      event :exit, transitions_to: :normal
-      event "找客服", transitions_to: :normal
-    end
-
-    state :ordering do
-      event "帮助", transitions_to: :ordering
-      event "照片", transitions_to: :ordering
-      event "下单", transitions_to: :submitting
-      event :exit, transitions_to: :normal
-    end
-
-    state :querying do
-      event :exit, transitions_to: :normal
-      event "数字", transitions_to: :normal
-    end
-
-    state :submitting do
-      event "确认", transitions_to: :normal
     end
   end
 
