@@ -16,6 +16,8 @@ class User < ActiveRecord::Base
   after_initialize :default_values
   has_many :orders
 
+  ImageNum = 1
+
   attr_accessor :res
 
   def 照片卡
@@ -104,7 +106,7 @@ class User < ActiveRecord::Base
     o.save
 
     p o.images
-    if o.images.count < 3 then
+    if o.images.count < ImageNum then
       self.res = {
         type: "text",
         content: "收到#{o.images.count}张照片。"
@@ -114,13 +116,13 @@ class User < ActiveRecord::Base
 
       self.res = {
         type: "text",
-        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "亲~您已发了#{ImageNum}张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
       }
     end
   end
 
   def 下单
-    puts "3"*20
+    puts "ImageNum"*20
     o = self.latest_order
     self.res = {
       type: "text",
@@ -129,11 +131,10 @@ class User < ActiveRecord::Base
   end
 
   def exit
-    self.res = {
-      type: "text",
-      content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【照片卡】创建照片卡。"
-    }
-    
+    # self.res = {
+    #   type: "text",
+    #   content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【照片卡】创建照片卡。"
+    # }
   end
 
   def latest_order

@@ -14,6 +14,7 @@ class SessionsController < ApplicationController
 
   def talk
     m = sender.process_message(receive_message)
+    p receive_message
     render_message(m)
   end
 
