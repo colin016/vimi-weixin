@@ -14,8 +14,13 @@ class WxMessage
     end
   end
 
-  def [](key)
-    method_name = key.to_s.underscore
+  def [](k)
+    method_name = k.to_s.underscore
     self.send(method_name) if respond_to? method_name
+  end
+
+  def []=(k, v)
+    method_name = (k.to_s.underscore + '=')
+    self.send(method_name, v) if respond_to? method_name
   end
 end
