@@ -1,5 +1,6 @@
 PureFortress9858::Application.routes.draw do
-  get "orders/edit"
+  resources :images
+
 
   get "sessions/entry"
   post "sessions/entry" => "sessions#talk"

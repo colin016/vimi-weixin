@@ -39,5 +39,5 @@ gem 'jquery-rails'
 # gem 'debugger'
 
 gem 'workflow'
-
 gem 'thin'
+
