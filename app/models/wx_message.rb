@@ -6,12 +6,21 @@ class WxMessage
 
   attr_accessor :status # => :in or :out
 
-  def initialize(xml)
-    hash = Hash.from_xml(xml)["xml"]
-    
+  def initialize(hash)
     hash.each_pair do |k, v|
       _k = (k.to_s.underscore + '=')
       self.send(_k, v) if respond_to? _k
+    end
+  end
+
+  def create(xml)
+    hash = Hash.from_xml(xml)["xml"]
+
+    case hash["MsgType"]
+    when "text"
+      WxTextMessage.new(hash)
+    when "image" 
+      WxImageMessage.new(hash)
     end
   end
 
