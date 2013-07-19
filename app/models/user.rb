@@ -214,11 +214,7 @@ public
       return ["照片!", m["PicUrl"]]
     end
   end
-
-  def send_message(text)
-    
-  end
-
+  
 private
   def host
     'weixin-forward.vida.fm'
