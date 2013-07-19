@@ -98,24 +98,6 @@ class User < ActiveRecord::Base
     # TODO
   end
 
-  def 下单
-    o = self.latest_order
-    self.res = {
-      type: "text",
-      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n #{edit_order_url(o, :host => host)}"
-    }
-  end
-
-  def 确认
-    o = self.latest_order
-    o.accept!
-
-    self.res = {
-      type: "text",
-      content: "亲~ 您的订单已经提交，订单号是#{o.id}。请尽快支付，以便我们为您制作和邮寄~~\n支付地址：【支付地址链接】\n\n如果支付期间遇到问题，请回复【找客服】。"
-    }
-  end
-
   def 数字(num)
     o = self.orders.find(num)
 
@@ -142,10 +124,6 @@ class User < ActiveRecord::Base
 
     if o.images.count < ImageNum then
       raise "SHOULDN'T BE HERE"
-      # self.res = {
-      #   type: "text",
-      #   content: "收到#{o.images.count}张照片。"
-      # }
     else
       self.res = {
         type: "text",
@@ -156,17 +134,12 @@ class User < ActiveRecord::Base
 
   def 下单
     o = self.latest_order
+    o.accept!
+
     self.res = {
       type: "text",
       content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
     } 
-  end
-
-  def exit
-    # self.res = {
-    #   type: "text",
-    #   content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【明信片】创建明信片。"
-    # }
   end
 
   def latest_order
