@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
     o = self.latest_order
     self.res = {
       type: "text",
-      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n #{edit_order_url(o, :host => 'weixin-forward.vida.fm')}"
+      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n #{edit_order_url(o, :host => host)}"
     }
   end
 
@@ -114,7 +114,7 @@ class User < ActiveRecord::Base
 
       self.res = {
         type: "text",
-        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: 'weixin-forward.vida.fm')}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
       }
     end
   end
@@ -124,7 +124,7 @@ class User < ActiveRecord::Base
     o = self.latest_order
     self.res = {
       type: "text",
-      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：#{edit_order_url(o, host: 'weixin-forward.vida.fm')}\n确认信息请回复【确认】~~"
+      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：#{edit_order_url(o, host: host)}\n确认信息请回复【确认】~~"
     } 
   end
 
@@ -162,7 +162,7 @@ class User < ActiveRecord::Base
 
     state :querying do
       event :exit, transitions_to: :normal
-      event "数字", transitions_to: :querying
+      event "数字", transitions_to: :normal
     end
 
     state :submitting do
@@ -202,6 +202,10 @@ public
   end
 
 private
+  def host
+    'weixin-forward.vida.fm'
+  end
+
   def default_values
     self.workflow_state ||= :normal
   end
