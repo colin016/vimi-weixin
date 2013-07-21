@@ -37,10 +37,12 @@ class Order < ActiveRecord::Base
   include Workflow
   workflow do
     state :new do
+      event :modify, transitions_to: :modified # 点击预览页面触发这个事件
+    end
+    state :modified do
       event :modify, transitions_to: :modified
       event :accept, transitions_to: :accepted
     end
-    state :modified
     state :accepted
     state :rejected
   end

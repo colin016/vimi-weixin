@@ -23,10 +23,12 @@ class User < ActiveRecord::Base
   include Workflow
   workflow do
     state :normal do
-      event "查订单", transitions_to: :querying
       event "明信片", transitions_to: :ordering
       event :q, transitions_to: :normal
       event "找客服", transitions_to: :normal
+
+      event "数字", transitions_to: :normal
+      event "查订单", transitions_to: :normal
     end
 
     state :ordering do
@@ -36,17 +38,15 @@ class User < ActiveRecord::Base
       event :q, transitions_to: :normal
     end
 
-    state :querying do
-      event :q, transitions_to: :normal
-      event "数字", transitions_to: :normal
-    end
-
-    # state :submitting do
-    #   event "确认", transitions_to: :normal
+    # state :querying do
+    #   event :q, transitions_to: :normal
+    #   event "数字", transitions_to: :normal
     # end
   end
 
   def q
+    self.latest_order.destroy if self.ordering? && self.latest_order && self.latest_order.current_state < :accepted
+
     content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
     self.res = {
       type: "text",
@@ -72,7 +72,7 @@ class User < ActiveRecord::Base
         type: "text",
         content: "暂时还没有您的订单。"
       }
-      self.exit!
+      self.q!
     else
       self.res = {
         type: "text",
@@ -140,6 +140,11 @@ class User < ActiveRecord::Base
       type: "text",
       content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
     } 
+  rescue Workflow::NoTransitionAllowed
+    self.res = {
+      type: "text",
+      content: "请补全您的信息，小印才能寄出哦"
+    }
   end
 
   def latest_order
@@ -154,12 +159,13 @@ public
 
   def process_message(m)
     event = message_to_event(m)
+    p event
     self.send(*event)
 
     return res
-  rescue NoMethodError, Workflow::NoTransitionAllowed => ex
+  rescue NoMethodError => ex
     p ex
-    self.exit!
+    self.q!
   end
 
   def message_to_event(m)
