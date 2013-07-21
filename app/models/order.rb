@@ -43,7 +43,9 @@ class Order < ActiveRecord::Base
       event :modify, transitions_to: :modified
       event :accept, transitions_to: :accepted
     end
-    state :accepted
+    state :accepted do
+      event :modify, transitions_to: :modified
+    end
     state :rejected
   end
 end
