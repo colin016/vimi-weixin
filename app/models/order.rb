@@ -3,6 +3,14 @@ require 'workflow'
 
 class Order < ActiveRecord::Base
   attr_accessible :user_id, :receiver_name, :receiver_address, :receiver_code, :receiver_contact
+  with_options unless: :new? do |o|
+    o.validates :receiver_name, :presence => true
+    o.validates :receiver_address, :presence => true
+    o.validates :receiver_code, :presence => true, :format => { :with => /\A\d{6}\z/,
+      :message => "should be 6 digits." }
+    o.validates :receiver_contact,:presence => true
+  end
+
   belongs_to :user
   has_many :images
 
@@ -29,25 +37,15 @@ class Order < ActiveRecord::Base
   include Workflow
   workflow do
     state :new do
-      event :proceed, :transitions_to => :asking_name
+      event :modify, transitions_to: :modified # 点击预览页面触发这个事件
+    end
+    state :modified do
+      event :modify, transitions_to: :modified
       event :accept, transitions_to: :accepted
     end
-    state :asking_name do
-      event :proceed, :transitions_to => :asking_address
+    state :accepted do
+      event :modify, transitions_to: :modified
     end
-    state :asking_address do
-      event :proceed, :transitions_to => :asking_code
-    end
-    state :asking_code do
-    	event :proceed, :transitions_to => :asking_contact
-    end
-    state :asking_contact do
-      event :proceed, :transitions_to => :submiting
-    end
-    state :submiting do
-    	event :proceed, :transitions_to => :accepted
-    end
-    state :accepted
     state :rejected
   end
 end

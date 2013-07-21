@@ -16,12 +16,49 @@ class User < ActiveRecord::Base
   after_initialize :default_values
   has_many :orders
 
+  ImageNum = 1
+
   attr_accessor :res
 
-  def 照片卡
+  include Workflow
+  workflow do
+    state :normal do
+      event "明信片", transitions_to: :ordering
+      event :q, transitions_to: :normal
+      event "找客服", transitions_to: :normal
+
+      event "数字", transitions_to: :normal
+      event "查订单", transitions_to: :normal
+    end
+
+    state :ordering do
+      event "帮助", transitions_to: :ordering
+      event "照片", transitions_to: :ordering
+      event "下单", transitions_to: :normal
+      event :q, transitions_to: :normal
+    end
+
+    # state :querying do
+    #   event :q, transitions_to: :normal
+    #   event "数字", transitions_to: :normal
+    # end
+  end
+
+  def q
+    self.latest_order.destroy if self.ordering? && self.latest_order && self.latest_order.current_state < :accepted
+
+    content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
     self.res = {
       type: "text",
-      content: "请选择您希望打印的12张照片发给我们。如果发照片期间您有问题，请回复【帮助】。"
+      content: content
+    }
+  end
+
+  def 明信片
+    content = "【明信片介绍】\n\n请选择您希望打印的照片直接发给小印~\n\n如果有问题请回复【帮助】\n\n制作明信片过程中您如果想要退出，可以随时回复【q】哦~~"
+    self.res = {
+      type: "text",
+      content: content
     }
   end
 
@@ -35,7 +72,7 @@ class User < ActiveRecord::Base
         type: "text",
         content: "暂时还没有您的订单。"
       }
-      self.exit!
+      self.q!
     else
       self.res = {
         type: "text",
@@ -50,6 +87,7 @@ class User < ActiveRecord::Base
 
   def 帮助
     o = self.latest_order
+    o.accept!
     self.res = {
       type: "text",
       content: "点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦（您已发#{o.images.count}张照片）~~"
@@ -58,24 +96,6 @@ class User < ActiveRecord::Base
 
   def 找客服
     # TODO
-  end
-
-  def 下单
-    o = self.latest_order
-    self.res = {
-      type: "text",
-      content: "感谢您下单！请在以下链接中输入您的邮寄信息。\n\n #{edit_order_url(o, :host => host)}"
-    }
-  end
-
-  def 确认
-    o = self.latest_order
-    o.accept!
-
-    self.res = {
-      type: "text",
-      content: "亲~ 您的订单已经提交，订单号是#{o.id}。请尽快支付，以便我们为您制作和邮寄~~\n支付地址：【支付地址链接】\n\n如果支付期间遇到问题，请回复【找客服】。"
-    }
   end
 
   def 数字(num)
@@ -95,7 +115,6 @@ class User < ActiveRecord::Base
   end
 
   def 照片(pic_url)
-    puts "1"*20
     o = self.latest_order
     im = o.images.create({path: "/images/#{SecureRandom::uuid}"})
     File.open("#{Rails.public_path}#{im.path}", "wb") do |io|
@@ -103,37 +122,29 @@ class User < ActiveRecord::Base
     end
     o.save
 
-    p o.images
-    if o.images.count < 3 then
-      self.res = {
-        type: "text",
-        content: "收到#{o.images.count}张照片。"
-      }
+    if o.images.count < ImageNum then
+      raise "SHOULDN'T BE HERE"
     else
-      puts "2"*20
-
       self.res = {
         type: "text",
-        content: "亲~您已发了3张照片，请点击一下链接查看您的照片。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
       }
     end
   end
 
   def 下单
-    puts "3"*20
     o = self.latest_order
-    self.res = {
-      type: "text",
-      content: "以下是订单信息：\n#{o.description}\n\n如果信息有误，请点击一下链接修改：#{edit_order_url(o, host: host)}\n确认信息请回复【确认】~~"
-    } 
-  end
+    o.accept!
 
-  def exit
     self.res = {
       type: "text",
-      content: "（实验功能！即将上线~ 上线之前所有订单无效。）\n1. 输入【查订单】查询订单。\n2. 输入【照片卡】创建照片卡。"
+      content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
+    } 
+  rescue Workflow::NoTransitionAllowed
+    self.res = {
+      type: "text",
+      content: "请补全您的信息，小印才能寄出哦"
     }
-    
   end
 
   def latest_order
@@ -144,42 +155,17 @@ class User < ActiveRecord::Base
     end
   end
 
-  include Workflow
-  workflow do
-    state :normal do
-      event "查订单", transitions_to: :querying
-      event "照片卡", transitions_to: :ordering
-      event :exit, transitions_to: :normal
-      event "找客服", transitions_to: :normal
-    end
-
-    state :ordering do
-      event "帮助", transitions_to: :ordering
-      event "照片", transitions_to: :ordering
-      event "下单", transitions_to: :submitting
-      event :exit, transitions_to: :normal
-    end
-
-    state :querying do
-      event :exit, transitions_to: :normal
-      event "数字", transitions_to: :normal
-    end
-
-    state :submitting do
-      event "确认", transitions_to: :normal
-    end
-  end
-
 public
 
   def process_message(m)
     event = message_to_event(m)
+    p event
     self.send(*event)
 
     return res
-  rescue NoMethodError, Workflow::NoTransitionAllowed => ex
+  rescue NoMethodError => ex
     p ex
-    self.exit!
+    self.q!
   end
 
   def message_to_event(m)
@@ -195,10 +181,6 @@ public
     elsif m["MsgType"] == 'image'
       return ["照片!", m["PicUrl"]]
     end
-  end
-
-  def send_message(text)
-    
   end
 
 private

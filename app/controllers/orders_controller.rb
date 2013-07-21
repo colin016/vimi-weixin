@@ -1,7 +1,7 @@
 class OrdersController < ApplicationController
   def edit
-  	p cookies
     @order = Order.find(params[:id])
+    @order.modify!
   end
 
   def update
