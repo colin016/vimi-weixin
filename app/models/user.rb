@@ -36,6 +36,9 @@ class User < ActiveRecord::Base
       event "照片", transitions_to: :ordering
       event "下单", transitions_to: :normal
       event :q, transitions_to: :normal
+
+      event "查订单", transitions_to: :ordering
+      event "数字", transitions_to: :ordering
     end
 
     # state :querying do
