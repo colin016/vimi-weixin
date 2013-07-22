@@ -165,11 +165,11 @@ public
     event = message_to_event(m)
     p event
     self.send(*event)
-
-    return res
   rescue NoMethodError => ex
     p ex
     self.q!
+  ensure 
+    res
   end
 
   def message_to_event(m)
