@@ -7,6 +7,7 @@ class WxMessage
   attr_accessor :status # => :in or :out
 
   def self.create(xml)
+    p xml
     hash = Hash.from_xml(xml)["xml"]
 
     case hash["MsgType"]
