@@ -143,11 +143,12 @@ class User < ActiveRecord::Base
       type: "text",
       content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
     } 
-  rescue Workflow::NoTransitionAllowed
+  rescue Workflow::NoTransitionAllowed => ex
     self.res = {
       type: "text",
       content: "请补全您的信息，小印才能寄出哦"
     }
+    raise ex
   end
 
   def latest_order
