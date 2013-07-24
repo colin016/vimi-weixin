@@ -12,9 +12,11 @@
   <% end %>
 
   <% @order.images.each do |im| %>
-  <div class="field">
-    <%= image_tag "#{im.path}" %>
-  </div>
+    <% im.preview_paths.each do |path| %>
+    <div class="field">
+      <%= image_tag "#{path}" %>
+    </div>
+    <% end -%>
   <% end -%>
 
   <div class="field">

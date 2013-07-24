@@ -119,10 +119,10 @@ class User < ActiveRecord::Base
 
   def 照片(pic_url)
     o = self.latest_order
+
     im = o.images.create({path: "/images/#{SecureRandom::uuid}"})
-    File.open("#{Rails.public_path}#{im.path}", "wb") do |io|
-      io.write(open(pic_url).read())
-    end
+    im.store!(pic_url)
+
     o.save
 
     if o.images.count < ImageNum then
