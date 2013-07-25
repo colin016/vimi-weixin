@@ -10,7 +10,7 @@ module ImageWithProcess
     canvas = Magick::Image.new(453, 332) { self.background_color = '#fefefe' }
     image = Magick::ImageList.new("#{Rails.public_path}#{self.path}")
     image.format = 'jpg'
-    canvas.format = 'jpg'
+    canvas.format = 'png'
     canvas.composite!(image.crop(0, 0, 391, 272), 30, 31, Magick::AtopCompositeOp)
 
     canvas
@@ -18,7 +18,6 @@ module ImageWithProcess
 
   def back
     @canvas = Magick::ImageList.new("#{Rails.public_path}/images/postcard无文字.png")
-    @canvas.format = 'jpg'
     draw = Magick::Draw.new
     draw.annotate(@canvas, 0, 0, 36, 48, "200240") do
       self.kerning = 10
@@ -56,8 +55,9 @@ module ImageWithProcess
 
   def preview_paths
     [:front, :back].map do |e| 
-      path = "#{Rails.public_path}/#{self.path}-#{e.to_s}.jpg"
-      send(e).write(path)
+      path = "#{self.path}-#{e.to_s}.png"
+      abs_path = "#{Rails.public_path}/#{path}"
+      send(e).write(abs_path)
       path
     end
   end
