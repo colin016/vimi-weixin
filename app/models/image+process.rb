@@ -9,6 +9,7 @@ module ImageWithProcess
   def front
     canvas = Magick::Image.new(453, 332) { self.background_color = '#fefefe' }
     image = Magick::ImageList.new("#{Rails.public_path}#{self.path}")
+    image.format = 'jpeg'
     canvas.composite!(image.crop(0, 0, 391, 272), 30, 31, Magick::AtopCompositeOp)
 
     canvas
@@ -16,6 +17,7 @@ module ImageWithProcess
 
   def back
     @canvas = Magick::ImageList.new("/Users/stranbird/Downloads/postcard无文字.png")
+    @canvas.format = 'jpeg'
     draw = Magick::Draw.new
     draw.annotate(@canvas, 0, 0, 36, 48, "200240") do
       self.kerning = 10
