@@ -4,23 +4,21 @@ require 'digest/sha1'
 
 class SessionsController < ApplicationController
   def entry
-  	my_params = {token: 'molitown'}
-  	my_params.merge! params.select { |k, v| k.to_s.match /timestamp|nonce/ }
-  	text = my_params.values.sort.join
-  	hash_text = Digest::SHA1.hexdigest text
+    my_params = {token: 'molitown'}
+    my_params.merge! params.select { |k, v| k.to_s.match /timestamp|nonce/ }
+    text = my_params.values.sort.join
+    hash_text = Digest::SHA1.hexdigest text
 
-  	render text: params['echostr'] if params['signature'] == hash_text
+    render text: params['echostr'] if params['signature'] == hash_text
   end
 
   def talk
     m = sender.process_message(receive_message)
-    p m
-  # ensure
     render_message(m)
   end
 
   def render_message(m)
-    if m[:type] == 'text' 
+    if m[:type] == 'text'
       @send_message = message_with_text(receive_message, m[:content])
       render :text
     else
@@ -39,11 +37,11 @@ class SessionsController < ApplicationController
   def message_with_text(message, text = nil)
     default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{message['Content']}"
 
-  	{
-  		toUser: message['FromUserName'],
-  		fromUser: message['ToUserName'],
-  		type: 'text',
-  		content: text || default_reply
-  	}
+    {
+      toUser: message['FromUserName'],
+      fromUser: message['ToUserName'],
+      type: 'text',
+      content: text || default_reply
+    }
   end
 end
