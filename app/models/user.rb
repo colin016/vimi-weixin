@@ -11,6 +11,7 @@ end
 
 
 class User < ActiveRecord::Base
+
   include Rails.application.routes.url_helpers
   attr_accessible :openid
   after_initialize :default_values
@@ -169,18 +170,12 @@ public
     p ex
     self.q!
   ensure
-    p '1' * 20
-    p self.res
-
-    1
-
     return self.res
-
-    # self.res
   end
 
   def message_to_event(m)
-    if m["MsgType"] == 'text'
+    case m["MsgType"]
+    when 'text'
       m_content = m['Content']
 
       if m_content.is_number?
@@ -188,9 +183,10 @@ public
       else
         return "#{m_content}!"
       end
-
-    elsif m["MsgType"] == 'image'
+    when 'image'
       return ["照片!", m["PicUrl"]]
+    else
+      raise UndefinedEvent 
     end
   end
 

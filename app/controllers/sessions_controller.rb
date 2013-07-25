@@ -15,6 +15,7 @@ class SessionsController < ApplicationController
   def talk
     m = sender.process_message(receive_message)
     render_message(m)
+  rescue UndefinedEvent
   end
 
   def render_message(m)
