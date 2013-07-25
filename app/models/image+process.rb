@@ -56,7 +56,7 @@ module ImageWithProcess
 
   def preview_paths
     [:front, :back].map do |e| 
-      path = "#{self.path}-#{e.to_s}"
+      path = "#{self.path}-#{e.to_s}.jpg"
       send(e).write(path)
       path
     end
