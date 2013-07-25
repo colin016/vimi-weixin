@@ -17,7 +17,7 @@ module ImageWithProcess
   end
 
   def back
-    @canvas = Magick::ImageList.new("/Users/stranbird/Downloads/postcard无文字.png")
+    @canvas = Magick::ImageList.new("#{Rails.public_path}images/postcard无文字.png")
     @canvas.format = 'jpg'
     draw = Magick::Draw.new
     draw.annotate(@canvas, 0, 0, 36, 48, "200240") do
@@ -29,7 +29,7 @@ module ImageWithProcess
     draw = Magick::Draw.new
     
     draw.annotate(@canvas, 0, 0, 40, 84, wrap_text(text, 13)) do 
-      self.font = "/Users/stranbird/Library/Fonts/myfont.ttf"
+      self.font = "#{Rails.public_path}fonts/myfont.ttf"
       self.pointsize = 16
     end
 
@@ -56,7 +56,7 @@ module ImageWithProcess
 
   def preview_paths
     [:front, :back].map do |e| 
-      path = "#{self.path}-#{e.to_s}.jpg"
+      path = "#{Rails.public_path}#{self.path}-#{e.to_s}.jpg"
       send(e).write(path)
       path
     end
