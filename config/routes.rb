@@ -1,5 +1,5 @@
 PureFortress9858::Application.routes.draw do
-  resources :images
+  # resources :images
 
 
   get "sessions/entry"
