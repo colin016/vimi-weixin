@@ -1,0 +1,1 @@
+class UndefinedEvent < Exception; end
