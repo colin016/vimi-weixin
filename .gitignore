@@ -16,5 +16,5 @@
 
 *.un~
 
-public/images/
+
 .DS_Store
