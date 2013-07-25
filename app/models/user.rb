@@ -83,7 +83,7 @@ class User < ActiveRecord::Base
       }
     end
 
-    if order_num > 1 
+    if order_num > 1
       self.res[:content] += "\n\n您还有#{order_num - 1}份历史订单，分别是：\n#{orders.simple_list(latest_order.id)}\n输入订单号查询这些订单。"
     end
   end
@@ -130,7 +130,7 @@ class User < ActiveRecord::Base
     else
       self.res = {
         type: "text",
-        content: "收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"  
+        content: "收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~"
       }
     end
   end
@@ -142,7 +142,7 @@ class User < ActiveRecord::Base
     self.res = {
       type: "text",
       content: "亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~"
-    } 
+    }
   rescue Workflow::NoTransitionAllowed => ex
     self.res = {
       type: "text",
@@ -168,8 +168,15 @@ public
   rescue NoMethodError => ex
     p ex
     self.q!
-  ensure 
-    res
+  ensure
+    p '1' * 20
+    p self.res
+
+    1
+
+    return self.res
+
+    # self.res
   end
 
   def message_to_event(m)
@@ -189,7 +196,7 @@ public
 
 private
   def host
-    'weixin-forward.vida.fm'
+    '106.186.29.15'
   end
 
   def default_values
