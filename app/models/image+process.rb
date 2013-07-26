@@ -11,7 +11,7 @@ module ImageWithProcess
     image = Magick::ImageList.new("#{Rails.public_path}#{self.path}")
     image.format = 'jpg'
     canvas.format = 'png'
-    canvas.composite!(image.crop(0, 0, 391, 272), 30, 31, Magick::AtopCompositeOp)
+    canvas.composite!(image.resize_to_fill(138, 95), 30, 31, Magick::AtopCompositeOp)
 
     canvas
   end
