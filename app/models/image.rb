@@ -4,6 +4,10 @@ class Image < ActiveRecord::Base
   attr_accessible :index, :order_id, :path
   belongs_to :order
 
+  [:receiver_name, :receiver_address, :receiver_code, :receiver_contact].each do |m|
+    delegate m, to: order
+  end
+
   include ImageWithProcess
 
   def store!(pic_url)

@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
       event "照片", transitions_to: :ordering
       event "下单", transitions_to: :normal
       event :q, transitions_to: :normal
+      event :i_dont_know, transitions_to: :ordering
 
       event "查订单", transitions_to: :ordering
       event "数字", transitions_to: :ordering
@@ -157,6 +158,13 @@ class User < ActiveRecord::Base
     raise ex
   end
 
+  def i_dont_know
+    self.res = {
+      type: "text",
+      content: "亲，小印不明白您的意思，如有问题请回复【帮助】，如果想要退出明信片编辑请回复【q】"
+    }
+  end
+
   def latest_order
     if (o = self.orders.last) && (not o.accepted?)
       return o
@@ -173,7 +181,11 @@ public
     self.send(*event)
   rescue NoMethodError => ex
     p ex
-    self.q!
+    if self.current_state == :ordering
+      self.i_dont_know!
+    else
+      self.q!
+    end
   ensure
     return self.res
   end
