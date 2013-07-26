@@ -18,9 +18,9 @@ module ImageWithProcess
   #   raise "Overwrite #{__method__}"
   # end
 
-  [:receiver_name, :receiver_address, :receiver_code, :receiver_contact, :path].each do |m| 
-    define_method(m) { raise "Overwrite #{__method__}" } 
-  end
+  # [:receiver_name, :receiver_address, :receiver_code, :receiver_contact, :path].each do |m| 
+  #   define_method(m) { raise "Overwrite #{__method__}" } 
+  # end
  
   def front
     canvas = Magick::Image.new(453, 332) { self.background_color = '#fefefe' }
