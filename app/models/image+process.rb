@@ -19,7 +19,7 @@ module ImageWithProcess
   def back
     @canvas = Magick::ImageList.new("#{Rails.public_path}/images/postcard无文字.png")
     draw = Magick::Draw.new
-    draw.annotate(@canvas, 0, 0, 36, 48, self.order.receiver_code || '') do
+    draw.annotate(@canvas, 0, 0, 36, 48, self.order.receiver_code || ' ') do
       self.kerning = 10
       self.pointsize = 18
     end
