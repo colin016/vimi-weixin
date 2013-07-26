@@ -51,7 +51,12 @@ class User < ActiveRecord::Base
   def q
     self.latest_order.destroy if self.ordering? && self.latest_order && self.latest_order.current_state < :accepted
 
-    content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
+    content = ''
+    if current_state == :normal
+    else
+      content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
+    end
+    
     self.res = {
       type: "text",
       content: content
