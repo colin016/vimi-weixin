@@ -13,7 +13,7 @@ module ImageWithProcess
  
   def front
     canvas = Magick::ImageList.new(front_template_path)
-    image = Magick::ImageList.new(path)
+    image = Magick::ImageList.new(abs_path)
     image.format = 'jpg'
     canvas.format = 'png'
     canvas.composite!(image.resize_to_fill(815, 562), 65, 65, Magick::AtopCompositeOp)
@@ -104,6 +104,10 @@ module ImageWithProcess
   def front_template_path
     "#{Rails.public_path}/images/postcard-01.png"
     # "/Users/stranbird/Downloads/postcard-01.png"
+  end
+
+  def abs_path
+    "#{Rails.public_path}/#{path}"
   end
 end
 
