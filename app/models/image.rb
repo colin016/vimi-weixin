@@ -1,14 +1,14 @@
 require 'image+process'
 
 class Image < ActiveRecord::Base
-  
+
   include ImageWithProcess
 
   attr_accessible :index, :order_id, :path
   belongs_to :order
 
   [:receiver_name, :receiver_address, :receiver_code, :receiver_contact].each do |m|
-    delegate m, to: order
+    delegate m, to: :order
   end
 
 
