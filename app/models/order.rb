@@ -35,6 +35,23 @@ class Order < ActiveRecord::Base
   end
   alias description to_s
 
+  require 'prawn'
+
+  def accept
+    image = iamges.first
+    origin_filename = "#{Rails.public_path}#{image.path}"
+    filename = "#{filename}.png"
+    front_filename = "#{filename}-#{front}.png"
+    back_filename = "#{filename}-#{back}.png"
+    Prawn::Document.generate(filename, page_size: [454, 332], margin: 0) do
+      # text 'Hello Dude!'
+      image front_filename#, position: :left, vposition: :top
+      image back_filename#, position: :left, vposition: :top
+    end
+
+    # `open #{filename}`
+  end
+
   include Workflow
   workflow do
     state :new do
