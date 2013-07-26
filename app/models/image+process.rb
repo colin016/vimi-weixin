@@ -5,22 +5,6 @@
 
 module ImageWithProcess
   require 'RMagick'
-
-  # def name
-  #   raise "Overwrite #{__method__}" 
-  # end
-
-  # def address
-  #   raise "Overwrite #{__method__}"
-  # end
-
-  # def path
-  #   raise "Overwrite #{__method__}"
-  # end
-
-  # [:receiver_name, :receiver_address, :receiver_code, :receiver_contact, :path].each do |m| 
-  #   define_method(m) { raise "Overwrite #{__method__}" } 
-  # end
  
   def front
     canvas = Magick::Image.new(453, 332) { self.background_color = '#fefefe' }
@@ -35,7 +19,7 @@ module ImageWithProcess
   def back
     @canvas = Magick::ImageList.new("#{Rails.public_path}/images/postcard无文字.png")
     draw = Magick::Draw.new
-    draw.annotate(@canvas, 0, 0, 36, 48, self.receiver_code || '') do
+    draw.annotate(@canvas, 0, 0, 36, 48, self.order.receiver_code || '') do
       self.kerning = 10
       self.pointsize = 18
     end
@@ -48,12 +32,14 @@ module ImageWithProcess
       self.pointsize = 16
     end
 
-    address(receiver_name, receiver_address)
+    address(self.order.receiver_name, self.order.receiver_address)
 
     @canvas[0]
   end
 
-  def address(name = '', loc = '')
+  def address(name, loc)
+    name ||= ''
+    loc ||= ''
     text = "#{name}(收)\n#{wrap_text(loc, 10)}"
 
     draw = Magick::Draw.new
