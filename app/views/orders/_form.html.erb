@@ -32,6 +32,10 @@
     <%= f.text_field :receiver_code %>
   </div>
   <div class="field">
+    <%= f.label :content, "想说的话" %>
+    <%= f.text_field :content %>
+  </div>
+  <div class="field">
     <%= f.label :receiver_contact, "希望邮寄的时间（精确到年月）" %>
     <%= f.text_field :receiver_contact, placeholder: "您在这里可以选择希望我们寄出的日期, 比如寄给10年后的自己" %>
   </div>

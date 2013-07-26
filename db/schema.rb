@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130713105135) do
+ActiveRecord::Schema.define(:version => 20130726034353) do
 
   create_table "images", :force => true do |t|
     t.integer  "order_id"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(:version => 20130713105135) do
     t.string   "receiver_contact"
     t.integer  "user_id"
     t.string   "status"
+    t.string   "content"
   end
 
   create_table "users", :force => true do |t|
