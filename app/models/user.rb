@@ -56,7 +56,7 @@ class User < ActiveRecord::Base
     else
       content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
     end
-    
+
     self.res = {
       type: "text",
       content: content
@@ -191,7 +191,6 @@ public
     when 'image'
       return ["照片!", m["PicUrl"]]
     else
-      raise UndefinedEvent 
     end
   end
 
