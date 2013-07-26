@@ -41,8 +41,8 @@ class Order < ActiveRecord::Base
     image = images.first
     origin_filename = "#{Rails.public_path}#{image.path}"
     pdf_filename = "#{origin_filename}.pdf"
-    front_filename = "#{orgin_filename}-front.png"
-    back_filename = "#{orgin_filename}-back.png"
+    front_filename = "#{origin_filename}-front.png"
+    back_filename = "#{origin_filename}-back.png"
     Prawn::Document.generate(pdf_filename, page_size: [454, 332], margin: 0) do
       # text 'Hello Dude!'
       image front_filename#, position: :left, vposition: :top
