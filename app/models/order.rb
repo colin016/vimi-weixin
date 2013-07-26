@@ -54,6 +54,11 @@ class Order < ActiveRecord::Base
     # `open #{filename}`
   end
 
+  def pdf_path
+    image = images.first
+    "#{image.path}.pdf"
+  end
+
   include Workflow
   workflow do
     state :new do
