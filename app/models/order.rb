@@ -38,7 +38,7 @@ class Order < ActiveRecord::Base
   require 'prawn'
 
   def accept
-    image = iamges.first
+    image = images.first
     origin_filename = "#{Rails.public_path}#{image.path}"
     filename = "#{filename}.png"
     front_filename = "#{filename}-#{front}.png"
