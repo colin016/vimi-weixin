@@ -40,15 +40,17 @@ class Order < ActiveRecord::Base
   def accept
     image = images.first
     origin_filename = "#{Rails.public_path}#{image.path}"
-    filename = "#{filename}.png"
-    front_filename = "#{filename}-#{front}.png"
-    back_filename = "#{filename}-#{back}.png"
+    filename = "#{origin_filename}.pdf"
+    front_filename = "#{filename}-front.png"
+    back_filename = "#{filename}-back.png"
     Prawn::Document.generate(filename, page_size: [454, 332], margin: 0) do
       # text 'Hello Dude!'
       image front_filename#, position: :left, vposition: :top
       image back_filename#, position: :left, vposition: :top
     end
-
+  rescue => ex
+    puts ex
+    raise ex
     # `open #{filename}`
   end
 
