@@ -11,3 +11,8 @@
  *= require_self
  *= require jqm-faltui/generated/jquery.mobile.flatui.min.css
  */
+
+
+.field img {
+  width: 100%;
+}

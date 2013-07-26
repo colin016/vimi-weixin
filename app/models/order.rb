@@ -2,7 +2,8 @@
 require 'workflow'
 
 class Order < ActiveRecord::Base
-  attr_accessible :user_id, :receiver_name, :receiver_address, :receiver_code, :receiver_contact
+  attr_accessible :user_id, :receiver_name, :receiver_address, :receiver_code, :receiver_contact, :content
+  
   with_options unless: :new? do |o|
     o.validates :receiver_name, :presence => true
     o.validates :receiver_address, :presence => true
