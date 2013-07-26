@@ -1,6 +1,9 @@
 require 'image+process'
 
 class Image < ActiveRecord::Base
+  
+  include ImageWithProcess
+
   attr_accessible :index, :order_id, :path
   belongs_to :order
 
@@ -8,7 +11,6 @@ class Image < ActiveRecord::Base
     delegate m, to: order
   end
 
-  include ImageWithProcess
 
   def store!(pic_url)
     File.open("#{Rails.public_path}#{self.path}", "wb") do |io|
