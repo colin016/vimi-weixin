@@ -44,7 +44,7 @@ module ImageWithProcess
     draw = Magick::Draw.new
     
     draw.annotate(@canvas, 0, 0, 80, 170, wrap_text(text, 17)) do 
-      self.font = my_font
+      self.font = "#{Rails.public_path}/fonts/myfont.ttf"
       self.pointsize = 25
     end
 
@@ -60,7 +60,7 @@ module ImageWithProcess
 
     draw = Magick::Draw.new
     draw.annotate(@canvas, 0, 0, 570, 260, text) do
-      self.font = my_font
+      self.font = "#{Rails.public_path}/fonts/myfont.ttf"
       self.pointsize = 25
       self.interline_spacing = 23
     end
