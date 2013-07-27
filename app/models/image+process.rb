@@ -16,7 +16,17 @@ module ImageWithProcess
     image = Magick::ImageList.new(abs_path)
     image.format = 'jpg'
     canvas.format = 'png'
-    canvas.composite!(image.resize_to_fill(815, 562), 65, 65, Magick::AtopCompositeOp)
+
+    
+    image[0].rotate!(90, '<')
+
+    if image[0].columns < image[0].rows
+      image[0].resize_to_fit!(815, 562)
+    else
+      image[0].resize_to_fill!(815, 562)
+    end
+
+    canvas.composite!(image, 65, 65, Magick::AtopCompositeOp)
 
     canvas
   end
@@ -34,8 +44,7 @@ module ImageWithProcess
     draw = Magick::Draw.new
     
     draw.annotate(@canvas, 0, 0, 80, 170, wrap_text(text, 17)) do 
-      self.font = "#{Rails.public_path}/fonts/myfont.ttf"
-      # self.font = '/Users/stranbird/dev/vimin-weixin/public/fonts/myfont.ttf'
+      self.font = my_font
       self.pointsize = 25
     end
 
@@ -51,8 +60,7 @@ module ImageWithProcess
 
     draw = Magick::Draw.new
     draw.annotate(@canvas, 0, 0, 570, 260, text) do
-      self.font = "#{Rails.public_path}/fonts/myfont.ttf"
-      # self.font = "/Users/stranbird/dev/vimin-weixin/public/fonts/myfont.ttf"
+      self.font = my_font
       self.pointsize = 25
       self.interline_spacing = 23
     end
@@ -65,15 +73,21 @@ module ImageWithProcess
 
   def preview_paths
     [:front, :back].map do |e| 
-      path = "#{self.path}-#{e.to_s}.png"
-      abs_path = "#{Rails.public_path}/#{path}"
-      send(e).write(abs_path)
-      path
+      save_path = "#{self.path}-#{e.to_s}.png"
+      send(e).write(save_path)
+      save_path
     end
   end
 
+  def my_font
+    "#{Rails.public_path}/fonts/myfont.ttf"
+
+    # "/Users/stranbird/dev/vimin-weixin/public/fonts/myfont.ttf"
+  end
+
   # def path
-  #   '/Users/stranbird/dev/cat'
+  #   # '/Users/stranbird/IMG_7265.JPG'
+  #   '/Users/stranbird/Downloads/1374127977.jpg'
   # end
 
   def name
@@ -98,20 +112,22 @@ module ImageWithProcess
 
   def back_template_path
     "#{Rails.public_path}/images/postcard-02.png"
-    # "/Users/stranbird/Downloads/postcard-02.png"
+    # "/Users/stranbird/dev/postcard-02.png"
   end
 
   def front_template_path
     "#{Rails.public_path}/images/postcard-01.png"
-    # "/Users/stranbird/Downloads/postcard-01.png"
+    # "/Users/stranbird/dev/postcard-01.png"
   end
 
   def abs_path
     "#{Rails.public_path}/#{path}"
+    # "#{path}"
   end
 end
 
 # include ImageWithProcess
 
-# preview_paths.first { |e| `open #{e}`}
-# `open #{preview_paths.first}`
+# p preview_paths
+
+# `open #{preview_paths.first} #{preview_paths.last} `
