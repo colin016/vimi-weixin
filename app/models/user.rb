@@ -3,13 +3,6 @@
 require 'workflow'
 require 'open-uri'
 
-class String
-  def is_number?
-    true if Float(self) rescue false
-  end
-end
-
-
 class User < ActiveRecord::Base
 
   include Rails.application.routes.url_helpers
@@ -173,12 +166,8 @@ class User < ActiveRecord::Base
     end
   end
 
-public
-
   def process_message(m)
-    event = message_to_event(m)
-    p event
-    self.send(*event)
+    self.send(*(m.to_event))
   rescue NoMethodError => ex
     p ex
     if self.current_state == :ordering

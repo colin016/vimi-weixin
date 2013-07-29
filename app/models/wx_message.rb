@@ -7,7 +7,6 @@ class WxMessage
   attr_accessor :status # => :in or :out
 
   def self.create(xml)
-    p xml
     hash = Hash.from_xml(xml)["xml"]
 
     case hash["MsgType"]
@@ -34,5 +33,5 @@ class WxMessage
     method_name = (k.to_s.underscore + '=')
     self.send(method_name, v) if respond_to? method_name
   end
-  
+
 end

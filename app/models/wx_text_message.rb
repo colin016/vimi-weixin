@@ -1,3 +1,9 @@
+class String
+  def is_number?
+    true if Float(self) rescue false
+  end
+end
+
 class WxTextMessage < WxMessage
   attr_accessor :content
   attr_accessor :msg_id
@@ -12,4 +18,5 @@ class WxTextMessage < WxMessage
       return m_content + '!'
     end  
   end
+
 end
