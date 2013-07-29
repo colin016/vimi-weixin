@@ -18,11 +18,8 @@ class SessionsController < ApplicationController
   end
 
   def render_message(m)
-    if m[:type] == 'text'
-      @send_message = receive_message.replay(m[:content])
-      render :text
-    else
-    end
+    send_m = receive_message.replay(m[:content])
+    render xml: send_m
   end
 
   def receive_message
@@ -33,5 +30,5 @@ class SessionsController < ApplicationController
   def sender
     @user ||= User.find_or_create_by_openid(receive_message['FromUserName'])
   end
-  
+
 end
