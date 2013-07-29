@@ -44,6 +44,7 @@ class User < ActiveRecord::Base
   end
 
   def q
+    puts "2"
     self.latest_order.destroy if self.ordering? && self.latest_order && self.latest_order.current_state < :accepted
 
     content = ''
@@ -53,6 +54,7 @@ class User < ActiveRecord::Base
     end
 
     self.m = WxTextMessage.from_content(content)
+    puts self.m
   end
 
   def 明信片
@@ -122,7 +124,9 @@ class User < ActiveRecord::Base
   end
 
   def i_dont_know
+    puts "1"
     self.m = WxTextMessage.from_content("亲，小印不明白您的意思，如有问题请回复【帮助】，如果想要退出明信片编辑请回复【q】")
+    puts self.m
   end
 
   def latest_order
@@ -133,16 +137,16 @@ class User < ActiveRecord::Base
     end
   end
 
-  def process_message(m)
-    self.send(*(m.to_event))
+  def process_message(recv_m)
+    self.send(*(recv_m.to_event))
+    return self.m
   rescue NoMethodError => ex
     if self.current_state == :ordering
       self.i_dont_know!
     else
       self.q!
     end
-  ensure
-    return m
+    return self.m
   end
 
   def self.from_message(m)

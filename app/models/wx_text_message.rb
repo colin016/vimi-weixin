@@ -9,9 +9,8 @@ class WxTextMessage < WxMessage
   attr_accessor :msg_id
   attr_accessor :func_flag
 
-  def self.from_content(content)
-    m = self.new
-    m.content = content
+  def self.from_content(text)
+    m = self.new({content: text})
   end
 
   def template
