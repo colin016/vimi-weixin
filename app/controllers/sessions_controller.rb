@@ -19,7 +19,7 @@ class SessionsController < ApplicationController
 
   def render_message(m)
     if m[:type] == 'text'
-      @send_message = message_with_text(receive_message, m[:content])
+      @send_message = receive_message.replay(m[:content])
       render :text
     else
     end
@@ -33,15 +33,5 @@ class SessionsController < ApplicationController
   def sender
     @user ||= User.find_or_create_by_openid(receive_message['FromUserName'])
   end
-
-  def message_with_text(message, text = nil)
-    default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{message['Content']}"
-
-    {
-      toUser: message['FromUserName'],
-      fromUser: message['ToUserName'],
-      type: 'text',
-      content: text || default_reply
-    }
-  end
+  
 end

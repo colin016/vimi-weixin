@@ -19,4 +19,15 @@ class WxTextMessage < WxMessage
     end  
   end
 
+  def reply(text = nil)
+    default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{self['Content']}"
+
+    {
+      toUser: self['FromUserName'],
+      fromUser: self['ToUserName'],
+      type: 'text',
+      content: text || default_reply
+    }
+  end
+
 end
