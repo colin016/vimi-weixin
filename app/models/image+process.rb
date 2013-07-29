@@ -1,26 +1,18 @@
 # encoding: utf-8
 
-
-# include Magick
-# class Rails
-#   def self.public_path
-#     ''
-#   end
-# end
-
 module ImageWithProcess
   require 'RMagick'
  
   def front
     canvas = Magick::ImageList.new(front_template_path)
-    image = Magick::ImageList.new(abs_path)
+    image = Magick::ImageList.new(abs_path(self.path))
     image.format = 'jpg'
     canvas.format = 'png'
 
     
     image[0].rotate!(90, '<')
 
-    if image[0].columns < image[0].rows
+    if image[0].columns == image[0].rows
       image[0].resize_to_fit!(815, 562)
     else
       image[0].resize_to_fill!(815, 562)
@@ -74,9 +66,15 @@ module ImageWithProcess
   def preview_paths
     [:front, :back].map do |e| 
       save_path = "#{self.path}-#{e.to_s}.png"
-      send(e).write(save_path)
+      send(e).write(abs_path(save_path))
+      p 'v' * 10 + __method__.to_s + 'v' * 10
       save_path
     end
+  rescue => ex
+    p '-' * 10 + __method__.to_s + '-' * 10
+    p ex
+    p '-' * 10 + __method__.to_s + '-' * 10
+    raise ex
   end
 
   def my_font
@@ -120,8 +118,8 @@ module ImageWithProcess
     # "/Users/stranbird/dev/postcard-01.png"
   end
 
-  def abs_path
-    "#{Rails.public_path}/#{path}"
+  def abs_path(p)
+    "#{Rails.public_path}/#{p}"
     # "#{path}"
   end
 end
