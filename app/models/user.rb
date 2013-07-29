@@ -156,7 +156,7 @@ class User < ActiveRecord::Base
     return self.m
   end
 
-  def from_message(m)
+  def self.from_message(m)
     find_or_create_by_openid(m['FromUserName'])
   end
 
