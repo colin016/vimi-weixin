@@ -45,8 +45,8 @@ class WxMessage
       else
         return "#{m_content}!"
       end
-    when 'image'
-      return ["照片!", m["PicUrl"]]
+    # when 'image'
+    #   return ["照片!", m["PicUrl"]]
     else
     end
   end
