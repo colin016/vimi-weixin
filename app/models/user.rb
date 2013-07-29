@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
   ImageNum = 1
 
   attr_accessor :res
-  attr_accessor :message
+  attr_accessor :m
 
   include Workflow
   workflow do
