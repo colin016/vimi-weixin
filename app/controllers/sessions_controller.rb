@@ -18,8 +18,8 @@ class SessionsController < ApplicationController
   end
 
   def render_message(m)
-    send_m = receive_message.replay(m[:content])
-    render xml: send_m
+    @send_message = receive_message.replay(m[:content])
+    render :text
   end
 
   def receive_message
