@@ -38,8 +38,4 @@ class WxTextMessage < WxMessage
     }
   end
 
-  def to_xml(o)
-    "123"
-  end
-
 end
