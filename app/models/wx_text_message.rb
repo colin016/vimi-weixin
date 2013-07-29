@@ -9,6 +9,10 @@ class WxTextMessage < WxMessage
   attr_accessor :msg_id
   attr_accessor :func_flag
 
+  def initialize(content = "")
+    self.content = content
+  end
+
   def template
     'text'
   end
