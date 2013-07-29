@@ -3,6 +3,7 @@
 require 'digest/sha1'
 
 class SessionsController < ApplicationController
+
   def entry
     my_params = {token: 'molitown'}
     my_params.merge! params.select { |k, v| k.to_s.match /timestamp|nonce/ }
@@ -13,22 +14,12 @@ class SessionsController < ApplicationController
   end
 
   def talk
-    m = sender.process_message(receive_message)
-    render_message(m)
-  end
+    recv_m = WxMessage.create(request.body.read)
+    user = User.find_or_create_by_openid(recv_m['FromUserName'])
+    m = user.process_message(recv_m)
 
-  def render_message(m)
-    @send_message = receive_message.reply(m[:content])
-    render :text
-  end
-
-  def receive_message
-    xml = request.body.read
-    @receive_message ||= WxMessage.create(xml)
-  end
-
-  def sender
-    @user ||= User.find_or_create_by_openid(receive_message['FromUserName'])
+    @send_message = recv_m.reply(m[:content])
+    render @send_message.template
   end
 
 end
