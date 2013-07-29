@@ -35,4 +35,16 @@ class WxMessage
     self.send(method_name, v) if respond_to? method_name
   end
 
+  def reply(text = nil)
+    default_reply = "系统正在升级中，小微会有些胡言乱语，请谅解~\n\n您刚刚说：#{self['Content']}"
+
+    o = {
+      toUserName: self['FromUserName'],
+      fromUserName: self['ToUserName'],
+      msgType: 'text',
+      content: text || default_reply
+    }
+    m = WxTextMessage.new(o)
+  end
+
 end
