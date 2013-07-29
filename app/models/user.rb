@@ -190,22 +190,6 @@ public
     return self.res
   end
 
-  def message_to_event(m)
-    case m["MsgType"]
-    when 'text'
-      m_content = m['Content']
-
-      if m_content.is_number?
-        return ["数字!", m_content]
-      else
-        return "#{m_content}!"
-      end
-    when 'image'
-      return ["照片!", m["PicUrl"]]
-    else
-    end
-  end
-
 private
   def host
     '106.186.29.15'
