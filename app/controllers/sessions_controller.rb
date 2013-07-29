@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
 
   def talk
     recv_m = WxMessage.create(request.body.read)
-    user = User.find_or_create_by_openid(recv_m['FromUserName'])
+    user = User.from_message(recv_m)
     m = user.process_message(recv_m)
 
     @send_message = recv_m.reply(m[:content])

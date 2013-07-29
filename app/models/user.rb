@@ -190,6 +190,10 @@ class User < ActiveRecord::Base
     return self.res
   end
 
+  def from_message(m)
+    find_or_create_by_openid(m['FromUserName'])
+  end
+
 private
   def host
     '106.186.29.15'
