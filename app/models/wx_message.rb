@@ -34,20 +34,5 @@ class WxMessage
     method_name = (k.to_s.underscore + '=')
     self.send(method_name, v) if respond_to? method_name
   end
-
-  def to_event
-    case m["MsgType"]
-    when 'text'
-      m_content = m['Content']
-
-      if m_content.is_number?
-        return ["数字!", m_content]
-      else
-        return "#{m_content}!"
-      end
-    # when 'image'
-    #   return ["照片!", m["PicUrl"]]
-    else
-    end
-  end
+  
 end
