@@ -1,8 +1,8 @@
 <xml>
- <ToUserName><![CDATA[<%= @send_message[:toUser] %>]]></ToUserName>
- <FromUserName><![CDATA[<%= @send_message[:fromUser] %>]]></FromUserName>
+ <ToUserName><![CDATA[<%= @send_message[:toUserName] %>]]></ToUserName>
+ <FromUserName><![CDATA[<%= @send_message[:fromUserName] %>]]></FromUserName>
  <CreateTime><%= Time.now.to_i %></CreateTime>
- <MsgType><![CDATA[<%= @send_message[:type] %>]]></MsgType>
+ <MsgType><![CDATA[<%= @send_message[:msgType] %>]]></MsgType>
  <Content><![CDATA[<%= @send_message[:content] %>]]></Content>
  <FuncFlag>0</FuncFlag>
  </xml>
