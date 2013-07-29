@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
   end
 
   def render_message(m)
-    @send_message = receive_message.replay(m[:content])
+    @send_message = receive_message.reply(m[:content])
     render :text
   end
 
