@@ -52,12 +52,12 @@ class User < ActiveRecord::Base
       content ="您已经退出了明信片制作~~想要重新制作，请回复【明信片】~"
     end
 
-    self.m = WxTextMessage.new(content)
+    self.m = WxTextMessage.from_content(content)
   end
 
   def 明信片
     content = "【明信片介绍】\n\n请选择您希望打印的照片直接发给小印~\n\n如果有问题请回复【帮助】\n\n制作明信片过程中您如果想要退出，可以随时回复【q】哦~~"
-    self.m = WxTextMessage.new(content)
+    self.m = WxTextMessage.from_content(content)
   end
 
   def 查订单
@@ -66,10 +66,10 @@ class User < ActiveRecord::Base
     latest_order = orders.last
 
     if order_num == 0
-      self.m = WxTextMessage.new("暂时还没有您的订单。")
+      self.m = WxTextMessage.from_content("暂时还没有您的订单。")
       self.q!
     else
-      self.m = WxTextMessage.new("以下是您最新一笔订单的信息与状态：\n#{latest_order.description}")
+      self.m = WxTextMessage.from_content("以下是您最新一笔订单的信息与状态：\n#{latest_order.description}")
     end
 
     if order_num > 1
@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
   end
 
   def 帮助
-    self.m = WxTextMessage.new("点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦~~")
+    self.m = WxTextMessage.from_content("点击以下链接，进入帮助页面【网页链接】。\n如果您还有其他问题，请回复【找客服】。\n如果您准备好了，现在就可以继续发照片给我们了哦~~")
   end
 
   def 找客服
@@ -88,9 +88,9 @@ class User < ActiveRecord::Base
   def 数字(num)
     o = self.orders.find(num)
 
-    self.m = WxTextMessage.new("以下是您查询的订单的信息与状态：\n#{o.description}")
+    self.m = WxTextMessage.from_content("以下是您查询的订单的信息与状态：\n#{o.description}")
   rescue ActiveRecord::RecordNotFound
-    self.m = WxTextMessage.new("对不起，没有与您查询相符的订单，请重新输入。\n\n您有#{orders.count}份历史订单，分别是：\n#{orders.simple_list}输入订单号查询这些订单。")
+    self.m = WxTextMessage.from_content("对不起，没有与您查询相符的订单，请重新输入。\n\n您有#{orders.count}份历史订单，分别是：\n#{orders.simple_list}输入订单号查询这些订单。")
   ensure
     puts "In #{__method__}(#{num})"
   end
@@ -106,7 +106,7 @@ class User < ActiveRecord::Base
     if o.images.count < ImageNum then
       raise "SHOULDN'T BE HERE"
     else
-      self.m = WxTextMessage.new("收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~")
+      self.m = WxTextMessage.from_content("收到您的照片啦~ 请点击以下链接填写您的邮寄信息。\n #{edit_order_url(o, host: host)}\n\n 如果您觉得没问题，就请回复【下单】吧~~")
     end
   end
 
@@ -116,17 +116,17 @@ class User < ActiveRecord::Base
     o.accept!
     puts '2' * 20
 
-    self.m = WxTextMessage.new("亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~[#{host}#{o.pdf_path}]")
+    self.m = WxTextMessage.from_content("亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~[#{host}#{o.pdf_path}]")
   rescue Workflow::NoTransitionAllowed => ex
     puts "--> #{ex}"
-    self.m = WxTextMessage.new("请补全您的信息，小印才能寄出哦")
+    self.m = WxTextMessage.from_content("请补全您的信息，小印才能寄出哦")
   rescue => ex
     puts "--> #{ex}"
     raise ex
   end
 
   def i_dont_know
-    self.m = WxTextMessage.new("亲，小印不明白您的意思，如有问题请回复【帮助】，如果想要退出明信片编辑请回复【q】")
+    self.m = WxTextMessage.from_content("亲，小印不明白您的意思，如有问题请回复【帮助】，如果想要退出明信片编辑请回复【q】")
   end
 
   def latest_order
