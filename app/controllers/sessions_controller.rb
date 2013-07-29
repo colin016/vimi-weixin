@@ -17,6 +17,7 @@ class SessionsController < ApplicationController
     recv_m = WxMessage.create(request.body.read)
     user = User.from_message(recv_m)
     m = user.process_message(recv_m)
+    p m
 
     @send_message = recv_m.reply(m[:content])
     render @send_message.template

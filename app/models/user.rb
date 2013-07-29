@@ -111,17 +111,13 @@ class User < ActiveRecord::Base
   end
 
   def 下单
-    puts '1' * 20
     o = self.latest_order
     o.accept!
-    puts '2' * 20
 
     self.m = WxTextMessage.from_content("亲~ 您的订单已经提交，订单号是#{o.id}。微米印打印完您的明信片就会按照您指示的时间寄出滴~~[#{host}#{o.pdf_path}]")
   rescue Workflow::NoTransitionAllowed => ex
-    puts "--> #{ex}"
     self.m = WxTextMessage.from_content("请补全您的信息，小印才能寄出哦")
   rescue => ex
-    puts "--> #{ex}"
     raise ex
   end
 
@@ -140,20 +136,13 @@ class User < ActiveRecord::Base
   def process_message(m)
     self.send(*(m.to_event))
   rescue NoMethodError => ex
-    p 'nme'*20
-    p ex
-    p 'nme'*20
     if self.current_state == :ordering
       self.i_dont_know!
     else
       self.q!
     end
   ensure
-    p '><'*20
-    p res
-    p m
-    p '><'*20
-    return self.m
+    return m
   end
 
   def self.from_message(m)
